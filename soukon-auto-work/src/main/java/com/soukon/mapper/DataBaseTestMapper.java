@@ -1,8 +1,9 @@
 package com.soukon.mapper;
 
 import com.alibaba.fastjson.JSONObject;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.soukon.bean.DatabaseTestBean;
+import com.soukon.domain.DatabaseTestBean;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
