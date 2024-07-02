@@ -1,0 +1,21 @@
+server:
+  port: 9915
+spring:
+  config:
+    import: nacos:application-value.yml
+  application:
+    name: common-test
+  profiles:
+    active: value,formal,private
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 172.23.104.184
+      config:
+        server-addr: 172.23.104.184
+        file-extension: yml
+        username: nacos
+        password: nacos
+        namespace: 7cb64de9-1ec0-4ab2-a619-e30f60225978
