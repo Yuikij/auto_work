@@ -1,4 +1,16 @@
 package com.soukon.domain;
 
-public class GroupScript {
+import lombok.Data;
+
+import java.util.List;
+
+//重组，得到的是long数组
+@Data
+public class GroupScript implements Script{
+    private List<DataCell> dataCells;
+
+    @Override
+    public List<Long> execute() {
+        return List.of();
+    }
 }
