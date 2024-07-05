@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import FormulaForm from "./pages/test";
+import FormulaForm from "./components/dataCell";
 
 function App() {
   return (
