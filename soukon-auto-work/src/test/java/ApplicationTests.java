@@ -5,8 +5,7 @@ import com.alibaba.excel.util.ListUtils;
 import com.alibaba.fastjson.JSON;
 import com.soukon.Application;
 import com.soukon.domain.DataCell;
-import com.soukon.domain.DataValue;
-import com.soukon.domain.FunctionScript;
+
 import com.soukon.domain.Script;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.util.Lists;
@@ -79,7 +78,7 @@ public class ApplicationTests {
         dataCell1.setStartIndex(4);
         dataCell1.setEndIndex(5);
 
-        FunctionScript functionScript = new FunctionScript();
+        Script functionScript = new Script();
         functionScript.setDataCells(Lists.list(dataCell1));
         DataCell dataCell2 = new DataCell();
         dataCell2.setScript(functionScript);

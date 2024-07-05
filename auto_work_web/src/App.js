@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import FormulaForm from "./components/dataCell";
+import DataCellForm from "./components/dataCell";
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
       {/*    Learn React*/}
       {/*  </a>*/}
       {/*</header>*/}
-      <FormulaForm/>
+      <DataCellForm/>
     </div>
   );
 }

@@ -25,8 +25,12 @@ public class DataCell {
     //   用于截取
     private int startIndex;
     private int endIndex;
+    //    是否是最终结果
     private boolean isRes;
+    //    所属的模板id
     private long templateId;
+    //具体数值
+    private long value;
 
 
     public List<Long> getValueBeGetIndex() {
