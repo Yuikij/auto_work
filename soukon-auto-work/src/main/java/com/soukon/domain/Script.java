@@ -1,18 +1,16 @@
 package com.soukon.domain;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
-//重组，得到的是long数组
+
 @Data
+@Slf4j
 public class Script {
     private int scriptType;
     private String operationScript;
     private List<DataCell> dataCells;
 
-
-    public List<Long> execute() {
-        return List.of();
-    }
 }

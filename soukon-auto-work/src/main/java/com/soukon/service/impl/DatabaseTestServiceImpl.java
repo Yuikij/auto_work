@@ -17,13 +17,23 @@ public class DatabaseTestServiceImpl extends ServiceImpl<DataBaseTestMapper, Dat
 
     public static void main(String[] args) throws ScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName("groovy");        JSONObject obj = new JSONObject();
-        obj.put("f1",1.1);
-        obj.put("f2",2);
-        obj.put("f3",3);
+        ScriptEngine engine = manager.getEngineByName("groovy");
+
+        JSONObject obj = new JSONObject();
+        obj.put("f1", 1.1);
+        obj.put("f2", 2);
+        obj.put("f3", 3);
         obj.forEach(engine::put);
         Object eval = engine.eval("f1+f2*f3");
         Double result = (Double) eval;
         System.out.println(result);
+        JSONObject obj2 = new JSONObject();
+        obj.put("f1", 1 + 0.0);
+        obj.put("f2", 1);
+        obj.put("f3", 1);
+        obj.forEach(engine::put);
+        Object eval2 = engine.eval("f1+f2*f3");
+        Double result2 = (Double) eval2;
+        System.out.println(result2);
     }
 }

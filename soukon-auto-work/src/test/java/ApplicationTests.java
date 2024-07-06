@@ -3,13 +3,16 @@ import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.event.AnalysisEventListener;
 import com.alibaba.excel.util.ListUtils;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.soukon.Application;
 import com.soukon.domain.DataCell;
 
 import com.soukon.domain.Script;
+import com.soukon.service.DataCellService;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
@@ -17,6 +20,9 @@ import java.util.Map;
 
 @SpringBootTest(classes = Application.class)
 public class ApplicationTests {
+
+    @Autowired
+    private DataCellService dataCellService;
 
     @Slf4j
     public static class NoModelDataListener extends AnalysisEventListener<Map<Integer, String>> {
@@ -65,26 +71,51 @@ public class ApplicationTests {
     }
 
     @Test
-    public void testData(){
+    public void testData() {
 //    1. "A.sum(c2->r4:r5),B.C3:C6"
 //    2. "A.c2*B.c3+B.c5r6+D.1"
 
 //    1. "A.sum(c2->r4:r5)+B.C3:C6"
 //    2. "A.c2*B.c3+B.c5r6+D.1"
-        DataCell dataCell1 = new DataCell();
+        String jstr = "{\n" +
+                "  \"name\":\"聚合表1\",\n" +
+                "  \"script\": {\n" +
+                "    \"dataCells\": [\n" +
+                "      {\n" +
+                "        \"type\": 2,\n" +
+                "        \"script\": {\n" +
+                "          \"dataCells\": [\n" +
+                "            {\n" +
+                "              \"type\": 1\n" +
+                "            },\n" +
+                "            {\n" +
+                "              \"type\": 3\n" +
+                "            }\n" +
+                "          ],\n" +
+                "          \"scriptType\": 2,\n" +
+                "          \"operationScript\": \"*\"\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"type\": 3\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"scriptType\": 2,\n" +
+                "    \"operationScript\": \"+\"\n" +
+                "  },\n" +
+                "  \"type\": 2\n" +
+                "}";
 
-        dataCell1.setSourceId(1L);
-        dataCell1.setColumnIndex(2);
-        dataCell1.setStartIndex(4);
-        dataCell1.setEndIndex(5);
-
-        Script functionScript = new Script();
-        functionScript.setDataCells(Lists.list(dataCell1));
-        DataCell dataCell2 = new DataCell();
-        dataCell2.setScript(functionScript);
-
-        DataCell dataCell = new DataCell();
-        dataCell.getValue();
+        DataCell dataCell = JSONObject.parseObject(jstr, DataCell.class);
+        System.out.println(dataCell);
+        List<Double> value = dataCellService.getValue(dataCell);
+        System.out.println(value);
     }
+
+    @Test
+    public void testDataCell() {
+        System.out.println(dataCellService.getById(1L));
+    }
+
 
 }
