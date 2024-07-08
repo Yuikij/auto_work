@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Form, Input, Button, Dropdown, Space, Menu, Tag, Card, Modal} from 'antd';
+import {Form, Input, Button, Dropdown, Space, Menu, Tag, Card, Modal, Select, Row, Col} from 'antd';
 import {
     PlusCircleOutlined,
     LoadingOutlined, SearchOutlined,
@@ -28,9 +28,13 @@ const operationEnum = [
     ]
 ;
 
-const dataType={
-
-}
+const dataType = [
+    {value: 1, label: '文件'},
+    {value: 2, label: '计算'},
+    {value: 3, label: '数据单元'},
+    {value: 4, label: '参数'},
+    {value: 5, label: '具体值'},
+]
 
 const onLabelClose = (e) => {
     e.preventDefault()
@@ -66,7 +70,7 @@ const DataCellForm = ({setDataCell}) => {
     const [groupName, setGroupName] = useState("");
     const [operationScript, setOperationScript] = useState("");
     const [showGroup, setShowGroup] = useState(false);
-    const [showData, setShowData] = useState(true);
+    const [showData, setShowData] = useState(false);
     const [operations, setOperations] = useState([]);
     const [dataLabels, setDataLabels] = useState([]);
     const [editingType, setEditingType] = useState(1);
@@ -169,37 +173,56 @@ const DataCellForm = ({setDataCell}) => {
                    onOk={handleGroupOk} onCancel={handleGroupCancel}
                    maskClosable={false}>
                 <Form>
-                    <Form.Item label={"选择数据类型"}>
-                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
-                    </Form.Item>
-
-                    <Form.Item label={"名称"}>
-                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
-                    </Form.Item>
-                    <Form.Item label={"行号"}>
-                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
-                    </Form.Item>
-                    <Form.Item label={"列号"}>
+                    <Row>
+                        <Col span={8}>
+                            <Form.Item label={"选择数据类型"}>
+                                <Select
+                                    style={{width: '300px'}}
+                                    allowClear
+                                    options={dataType}
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item label={"名称"}>
+                                <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    {/*文件*/}
+                    <Form.Item label={"选择文件"}>
                         <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
                     </Form.Item>
                     <Form.Item label={"输入表名"}>
                         <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
                     </Form.Item>
-                    <Form.Item label={"选择文件"}>
-                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
-                    </Form.Item>
-                    <Form.Item label={"选择参数"}>
-                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
-                    </Form.Item>
-                    <Form.Item label={"选择数据单元"}>
-                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
-                    </Form.Item>
+                    <Row>
+                        <Col span={8}>
+                            <Form.Item label={"行号"}>
+                                <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item label={"列号"}>
+                                <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
                     <Form.Item label={"选择起始索引"}>
                         <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
                     </Form.Item>
                     <Form.Item label={"选择终止索引"}>
                         <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
                     </Form.Item>
+
+                    <Form.Item label={"选择参数"}>
+                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
+                    </Form.Item>
+                    <Form.Item label={"选择数据单元"}>
+                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
+                    </Form.Item>
+
                     <Form.Item label={"填入数值"}>
                         <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
                     </Form.Item>

@@ -50,7 +50,7 @@ public class ScriptServiceImpl implements ScriptService {
         List<List<Double>> tmp = new ArrayList<>();
         AtomicInteger size = new AtomicInteger(1);
         dataCells.forEach(dataCell -> {
-            List<Double> values = dataCellService.getValue(dataCell, params);
+            List<Double> values = dataCellService.getValue(dataCell, null);
             if (values.size() > 1) {
                 if (size.get() > 1 && values.size() != size.get()) {
                     log.error("运算符表达式的数据集大小不一致");
@@ -98,7 +98,7 @@ public class ScriptServiceImpl implements ScriptService {
     public List<Double> executeGroup(Script script) {
         List<DataCell> dataCells = script.getDataCells();
         List<Double> res = new ArrayList<>();
-        dataCells.forEach(dataCell -> res.addAll(dataCellService.getValue(dataCell, params)));
+        dataCells.forEach(dataCell -> res.addAll(dataCellService.getValue(dataCell, null)));
         return res;
     }
 

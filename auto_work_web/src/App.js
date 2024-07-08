@@ -1,6 +1,8 @@
 import logo from './logo.svg';
 import './App.css';
 import DataCellForm from "./components/dataCell";
+import LoginPage from "./components/login/LoginPage";
+import AppRouter from "./AppRouter";
 
 function App() {
   return (
@@ -19,7 +21,8 @@ function App() {
       {/*    Learn React*/}
       {/*  </a>*/}
       {/*</header>*/}
-      <DataCellForm/>
+      {/*<DataCellForm/>*/}
+        <AppRouter />
     </div>
   );
 }
