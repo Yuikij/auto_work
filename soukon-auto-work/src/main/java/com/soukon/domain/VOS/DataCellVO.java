@@ -10,6 +10,6 @@ import java.util.List;
 public class DataCellVO {
     private long id;
     private String name;
-    private List<Long> value;
+    private List<Double> value;
 
 }

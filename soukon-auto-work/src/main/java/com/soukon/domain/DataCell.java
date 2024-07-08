@@ -9,7 +9,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName(value = "data_cell",autoResultMap = true)
+@TableName(value = "data_cell", autoResultMap = true)
 // script和sourceId只会存在一种
 public class DataCell {
     private long id;
@@ -36,6 +36,8 @@ public class DataCell {
     private long templateId;
     //具体数值
     private double specificValue;
+    //    参数名
+    private String paramName;
     private int type;
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdTime;

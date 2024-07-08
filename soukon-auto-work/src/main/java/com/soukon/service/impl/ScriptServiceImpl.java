@@ -7,7 +7,6 @@ import com.soukon.domain.Script;
 import com.soukon.enums.ScriptEnum;
 import com.soukon.service.DataCellService;
 import com.soukon.service.ScriptService;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -51,7 +50,7 @@ public class ScriptServiceImpl implements ScriptService {
         List<List<Double>> tmp = new ArrayList<>();
         AtomicInteger size = new AtomicInteger(1);
         dataCells.forEach(dataCell -> {
-            List<Double> values = dataCellService.getValue(dataCell);
+            List<Double> values = dataCellService.getValue(dataCell, params);
             if (values.size() > 1) {
                 if (size.get() > 1 && values.size() != size.get()) {
                     log.error("运算符表达式的数据集大小不一致");
@@ -99,7 +98,7 @@ public class ScriptServiceImpl implements ScriptService {
     public List<Double> executeGroup(Script script) {
         List<DataCell> dataCells = script.getDataCells();
         List<Double> res = new ArrayList<>();
-        dataCells.forEach(dataCell -> res.addAll(dataCellService.getValue(dataCell)));
+        dataCells.forEach(dataCell -> res.addAll(dataCellService.getValue(dataCell, params)));
         return res;
     }
 

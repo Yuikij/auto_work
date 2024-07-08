@@ -5,7 +5,7 @@ import {
     LoadingOutlined, SearchOutlined,
     SettingFilled,
     SmileOutlined,
-    SyncOutlined, CloseCircleOutlined, TwitterOutlined,
+    SyncOutlined, CloseCircleOutlined,
 } from '@ant-design/icons';
 import {evaluate} from 'mathjs';
 
@@ -27,6 +27,10 @@ const operationEnum = [
         {key: "data", label: "选择数据单元"},
     ]
 ;
+
+const dataType={
+
+}
 
 const onLabelClose = (e) => {
     e.preventDefault()
@@ -168,6 +172,7 @@ const DataCellForm = ({setDataCell}) => {
                     <Form.Item label={"选择数据类型"}>
                         <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
                     </Form.Item>
+
                     <Form.Item label={"名称"}>
                         <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
                     </Form.Item>
@@ -175,6 +180,27 @@ const DataCellForm = ({setDataCell}) => {
                         <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
                     </Form.Item>
                     <Form.Item label={"列号"}>
+                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
+                    </Form.Item>
+                    <Form.Item label={"输入表名"}>
+                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
+                    </Form.Item>
+                    <Form.Item label={"选择文件"}>
+                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
+                    </Form.Item>
+                    <Form.Item label={"选择参数"}>
+                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
+                    </Form.Item>
+                    <Form.Item label={"选择数据单元"}>
+                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
+                    </Form.Item>
+                    <Form.Item label={"选择起始索引"}>
+                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
+                    </Form.Item>
+                    <Form.Item label={"选择终止索引"}>
+                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
+                    </Form.Item>
+                    <Form.Item label={"填入数值"}>
                         <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
                     </Form.Item>
                 </Form>

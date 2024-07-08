@@ -1,5 +1,6 @@
 package com.soukon.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.soukon.core.http.ApiResponse;
 import com.soukon.domain.DataCell;
@@ -27,7 +28,7 @@ public class DataCellServiceImpl extends ServiceImpl<DataCellMapper, DataCell> i
     private FileService fileService;
 
     @Override
-    public List<Double> getValue(DataCell dataCell) {
+    public List<Double> getValue(DataCell dataCell, JSONObject params) {
         int type = dataCell.getType();
         Script script = dataCell.getScript();
         if (DataCellEnum.FILE.getValue() == type) {
@@ -36,19 +37,20 @@ public class DataCellServiceImpl extends ServiceImpl<DataCellMapper, DataCell> i
             return scriptService.execute(script);
         } else if (DataCellEnum.DATA.getValue() == type) {
             return getDataValue(dataCell);
-//            todo
         } else if (DataCellEnum.PARAM.getValue() == type) {
-            return List.of(1.0);
+            return List.of(params.getDouble(dataCell.getParamName()));
         } else if (DataCellEnum.VAL.getValue() == type) {
             return List.of(dataCell.getSpecificValue());
         }
         return List.of();
     }
 
+
+
     public List<Double> getDataValue(DataCell dataCell) {
         Long sourceId = dataCell.getSourceId();
         DataCell data = getById(sourceId);
-        List<Double> value = getValue(data);
+        List<Double> value = getValue(data, null);
         if (data.getSelectIndex() != null) {
             return Collections.singletonList(value.get(data.getSelectIndex()));
         }

@@ -7,10 +7,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.soukon.Application;
 import com.soukon.domain.DataCell;
 
-import com.soukon.domain.Script;
 import com.soukon.service.DataCellService;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -108,7 +106,7 @@ public class ApplicationTests {
 
         DataCell dataCell = JSONObject.parseObject(jstr, DataCell.class);
         System.out.println(dataCell);
-        List<Double> value = dataCellService.getValue(dataCell);
+        List<Double> value = dataCellService.getValue(dataCell, params);
         System.out.println(value);
     }
 
