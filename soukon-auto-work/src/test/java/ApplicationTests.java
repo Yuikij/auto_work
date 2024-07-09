@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.soukon.Application;
 import com.soukon.domain.DataCell;
 
+import com.soukon.mapper.DataCellMapper;
 import com.soukon.service.DataCellService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,8 @@ public class ApplicationTests {
 
     @Autowired
     private DataCellService dataCellService;
+    @Autowired
+    private DataCellMapper dataCellMapper;
 
     @Slf4j
     public static class NoModelDataListener extends AnalysisEventListener<Map<Integer, String>> {
@@ -106,7 +109,7 @@ public class ApplicationTests {
 
         DataCell dataCell = JSONObject.parseObject(jstr, DataCell.class);
         System.out.println(dataCell);
-        List<Double> value = dataCellService.getValue(dataCell, params);
+        List<Double> value = dataCellService.getValue(dataCell, null);
         System.out.println(value);
     }
 

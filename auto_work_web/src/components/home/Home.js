@@ -1,5 +1,6 @@
 import axiosInstance from "../../utils/request";
 import {useNavigate} from "react-router-dom";
+import FileTree from "../fileTree";
 
 const Home = () => {
     const navigate = useNavigate();
@@ -11,6 +12,8 @@ const Home = () => {
     //         console.error('Error fetching data:', error);
     //     });
 
-    return <div>HOME</div>
+    return <div>
+        <FileTree/>
+    </div>
 }
 export default Home;
