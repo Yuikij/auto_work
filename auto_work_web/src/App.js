@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import DataCellForm from "./components/dataCell";
+import DataCellForm from "./components/DataCell";
 import LoginPage from "./components/login/LoginPage";
 import AppRouter from "./AppRouter";
 
