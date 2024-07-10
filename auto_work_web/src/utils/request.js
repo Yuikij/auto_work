@@ -18,9 +18,20 @@ const request = () => {
 const axiosInstance = axios.create({
     // baseURL: 'http://127.0.0.1:9915',
     timeout: 1000,
-    headers: {'Content-Type': 'application/json'},
+    // headers: {'Content-Type': 'application/json'},
 });
-
+axiosInstance.interceptors.request.use(
+    config => {
+        const token = localStorage.getItem('token'); // 从 localStorage 获取 token
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`; // 将 token 添加到请求头
+        }
+        return config;
+    },
+    error => {
+        return Promise.reject(error);
+    }
+);
 axiosInstance.interceptors.response.use(
     response => response,
     error => {

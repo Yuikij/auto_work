@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, Button, Checkbox } from 'antd';
+import {Form, Input, Button, Checkbox, message} from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import './LoginPage.css';
 import axiosInstance from "../../utils/request";
@@ -14,6 +14,9 @@ const LoginPage = () => {
                 console.log(response);
                 console.log(axiosInstance.isSuccess(response));
                 if (axiosInstance.isSuccess(response)){
+                    const { token } = response.data.data;
+                    localStorage.setItem('token', token); // 将 token 存储到 localStorage
+                    message.success('登录成功');
                     navigate('/home')
                 }
                 // setData(response.data);
