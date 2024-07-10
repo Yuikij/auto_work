@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Data
 @TableName(value = "data_cell", autoResultMap = true)
@@ -19,8 +20,8 @@ public class DataCell {
     //    数据集或数据值的话，先计算
     private Long sourceId;
     //    文件的情况
-    private int rowIndex;
-    private int columnIndex;
+    private Integer rowIndex;
+    private Integer columnIndex;
     private String sheet;
     //    数据集的某个值,优先级比start end高
     private Integer selectIndex;
@@ -44,4 +45,16 @@ public class DataCell {
     @TableField(fill = FieldFill.UPDATE)
     private LocalDateTime updatedTime;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DataCell dataCell = (DataCell) o;
+        return id == dataCell.id && isRes == dataCell.isRes && templateId == dataCell.templateId && Double.compare(specificValue, dataCell.specificValue) == 0 && type == dataCell.type && Objects.equals(name, dataCell.name) && Objects.equals(sourceId, dataCell.sourceId) && Objects.equals(rowIndex, dataCell.rowIndex) && Objects.equals(columnIndex, dataCell.columnIndex) && Objects.equals(sheet, dataCell.sheet) && Objects.equals(selectIndex, dataCell.selectIndex) && Objects.equals(script, dataCell.script) && Objects.equals(startIndex, dataCell.startIndex) && Objects.equals(endIndex, dataCell.endIndex) && Objects.equals(paramName, dataCell.paramName) && Objects.equals(createdTime, dataCell.createdTime) && Objects.equals(updatedTime, dataCell.updatedTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, sourceId, rowIndex, columnIndex, sheet, selectIndex, script, startIndex, endIndex, isRes, templateId, specificValue, paramName, type, createdTime, updatedTime);
+    }
 }

@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -27,8 +29,14 @@ public class DataCellServiceImpl extends ServiceImpl<DataCellMapper, DataCell> i
     @Autowired
     private FileService fileService;
 
+    public static final ThreadLocal<Map<DataCell, List<Double>>> threadLocalMap = ThreadLocal.withInitial(HashMap::new);
+
     @Override
     public List<Double> getValue(DataCell dataCell, JSONObject params) {
+        List<Double> doubles = threadLocalMap.get().get(dataCell);
+        if (doubles!=null){
+            return doubles;
+        }
         int type = dataCell.getType();
         Script script = dataCell.getScript();
         if (DataCellEnum.FILE.getValue() == type) {

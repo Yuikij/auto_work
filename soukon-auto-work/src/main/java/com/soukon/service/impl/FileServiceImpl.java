@@ -1,23 +1,60 @@
 package com.soukon.service.impl;
 
+import com.alibaba.excel.EasyExcel;
 import com.soukon.domain.DataCell;
+import com.soukon.domain.Files;
+import com.soukon.listener.GetDataCellValueListener;
 import com.soukon.service.FileService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
+@Slf4j
 public class FileServiceImpl implements FileService {
-    @Override
-    public List<Double> getValue(DataCell dataCell) {
-        return List.of();
+    public static final ThreadLocal<Map<Long, InputStream>> threadLocalMap = ThreadLocal.withInitial(HashMap::new);
+
+    //todo 支持压缩和结构化文件
+    public void getMapStream(List<MultipartFile> multipartFiles, List<Files> files) {
+        files.forEach(e -> {
+            multipartFiles.forEach(multipartFile -> {
+                if (e.getName().equals(multipartFile.getOriginalFilename())) {
+                    try {
+                        threadLocalMap.get().put(e.getId(), multipartFile.getInputStream());
+                    } catch (IOException ex) {
+                        log.error("解析文件出错", ex);
+                    }
+                }
+            });
+        });
     }
 
-    public List<Double> getValue(DataCell dataCell, Map<Long, InputStream> inputStreamMap) {
+    @Override
+    public List<Double> getValue(DataCell dataCell) {
+        Map<Long, InputStream> inputStreamMap = threadLocalMap.get();
         Long sourceId = dataCell.getSourceId();
+        List<Double> res = new ArrayList<>();
+        ReentrantLock lock = new ReentrantLock();
+        Condition condition = lock.newCondition();
+        try {
+            lock.lock();
+            condition.await();
+        } catch (InterruptedException e) {
+            log.error("等待解析文件出错", e);
+        }finally {
+            lock.unlock();
+        }
         InputStream inputStream = inputStreamMap.get(sourceId);
-        return List.of();
+        EasyExcel.read(inputStream, new GetDataCellValueListener(dataCell, lock, condition, res)).sheet(dataCell.getSheet()).doRead();
+        return res;
     }
 }

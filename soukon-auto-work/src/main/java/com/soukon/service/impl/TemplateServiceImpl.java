@@ -10,10 +10,9 @@ import com.soukon.service.DataCellService;
 import com.soukon.service.TemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class TemplateServiceImpl implements TemplateService {
@@ -26,13 +25,19 @@ public class TemplateServiceImpl implements TemplateService {
         wrapper.eq(DataCell::getTemplateId, templateId).eq(DataCell::isRes, true);
         List<DataCell> list = dataCellService.list(wrapper);
         List<DataCellVO> res = list.stream().map(e -> {
-            List<Double> value = dataCellService.getValue(e,params);
+            List<Double> value = dataCellService.getValue(e, params);
             DataCellVO dataCellVO = new DataCellVO();
             dataCellVO.setId(e.getId());
             dataCellVO.setName(e.getName());
             dataCellVO.setValue(value);
             return dataCellVO;
         }).toList();
+        DataCellServiceImpl.threadLocalMap.remove();
         return ApiResponse.<DataCellVO>success().list(res);
+    }
+
+    @Override
+    public ApiResponse<Object> templateExecute(List<MultipartFile> files, String templateId, String params) {
+        return null;
     }
 }
