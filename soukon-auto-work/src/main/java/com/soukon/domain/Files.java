@@ -14,6 +14,7 @@ public class Files {
     private Long id;
     private Long userId;
     private Long parentId;
+    private Long templateId;
     private String name;
     @TableField(exist = false)
     private List<Files> subFiles;

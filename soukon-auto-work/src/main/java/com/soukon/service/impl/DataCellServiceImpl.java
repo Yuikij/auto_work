@@ -1,9 +1,11 @@
 package com.soukon.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.soukon.core.http.ApiResponse;
 import com.soukon.domain.DataCell;
+import com.soukon.domain.Files;
 import com.soukon.domain.Script;
 import com.soukon.enums.DataCellEnum;
 import com.soukon.mapper.DataCellMapper;
@@ -69,16 +71,20 @@ public class DataCellServiceImpl extends ServiceImpl<DataCellMapper, DataCell> i
     }
 
     @Override
-    public ApiResponse<Object> saveDataCell(DataCell dataCell) {
-        return null;
+    public ApiResponse<Object> templateEdit(List<DataCell> dataCells, String templateId) {
+        remove(Wrappers.lambdaQuery(DataCell.class).eq(DataCell::getTemplateId, templateId));
+        dataCells.forEach(dataCell -> {
+            dataCell.setTemplateId(Long.parseLong(templateId));
+        });
+        saveBatch(dataCells);
+        return ApiResponse.success("修改成功");
     }
 
     @Override
-    public ApiResponse<DataCell> listDataCell(Long templateId) {
-        return null;
+    public ApiResponse<DataCell> templateGet(String templateId) {
+        List<DataCell> list = list(Wrappers.lambdaQuery(DataCell.class).eq(DataCell::getTemplateId, templateId));
+        return ApiResponse.<DataCell>success("查询成功").list(list);
+
     }
 
-    public ApiResponse<DataCell> oneDataCell(Long dataCellId) {
-        return ApiResponse.success(new DataCell());
-    }
 }

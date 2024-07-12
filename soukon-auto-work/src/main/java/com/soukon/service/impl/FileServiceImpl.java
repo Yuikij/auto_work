@@ -1,9 +1,13 @@
 package com.soukon.service.impl;
 
 import com.alibaba.excel.EasyExcel;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.soukon.core.http.ApiResponse;
 import com.soukon.domain.DataCell;
 import com.soukon.domain.Files;
 import com.soukon.listener.GetDataCellValueListener;
+import com.soukon.mapper.FilesMapper;
 import com.soukon.service.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,7 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @Slf4j
-public class FileServiceImpl implements FileService {
+public class FileServiceImpl extends ServiceImpl<FilesMapper, Files> implements FileService {
     public static final ThreadLocal<Map<Long, InputStream>> threadLocalMap = ThreadLocal.withInitial(HashMap::new);
 
     //todo 支持压缩和结构化文件
@@ -50,11 +54,27 @@ public class FileServiceImpl implements FileService {
             condition.await();
         } catch (InterruptedException e) {
             log.error("等待解析文件出错", e);
-        }finally {
+        } finally {
             lock.unlock();
         }
         InputStream inputStream = inputStreamMap.get(sourceId);
         EasyExcel.read(inputStream, new GetDataCellValueListener(dataCell, lock, condition, res)).sheet(dataCell.getSheet()).doRead();
         return res;
+    }
+
+    @Override
+    public ApiResponse<Files> filesGet(String templateId) {
+        List<Files> list = list(Wrappers.lambdaQuery(Files.class).eq(Files::getTemplateId, templateId));
+        return ApiResponse.<Files>success("查询成功").list(list);
+    }
+
+    @Override
+    public ApiResponse<Object> templateEdit(List<Files> files, String templateId) {
+        remove(Wrappers.lambdaQuery(Files.class).eq(Files::getTemplateId, templateId));
+        files.forEach(file -> {
+            file.setTemplateId(Long.parseLong(templateId));
+        });
+        saveBatch(files);
+        return ApiResponse.success("修改成功");
     }
 }
