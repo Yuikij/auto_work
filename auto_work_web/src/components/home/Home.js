@@ -1,6 +1,6 @@
 import axiosInstance from "../../utils/request";
 import {useNavigate} from "react-router-dom";
-import FileTree from "../FileTree";
+import FileList from "../FileList";
 import Template from "../Template";
 
 const Home = () => {
@@ -14,7 +14,7 @@ const Home = () => {
     //     });
 
     return <div>
-        <FileTree/>
+        <FileList/>
         <Template/>
     </div>
 }
