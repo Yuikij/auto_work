@@ -9,6 +9,7 @@ public class Template {
     private Long id;
     private Long userId;
     private String name;
-//    文件1数据2
-    private int  type;
+    //    文件1数据2
+    private int type;
+    private int fileTemplateId;
 }
