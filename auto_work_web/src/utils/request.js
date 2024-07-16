@@ -37,7 +37,7 @@ axiosInstance.interceptors.response.use(
     error => {
         if (error.response && error.response.status === 401) {
 
-            // window.location.href = '/login'; // 当收到401错误时跳转到登录页
+            window.location.href = '/login'; // 当收到401错误时跳转到登录页
         }
         return Promise.reject(error);
     }
