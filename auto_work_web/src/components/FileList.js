@@ -13,8 +13,8 @@ const FileList = () => {
             .then(response => {
                 console.log(response);
                 console.log(axiosInstance.isSuccess(response));
-                if (axiosInstance.isSuccess(response)){
-                    const { list } = response.data;
+                if (axiosInstance.isSuccess(response)) {
+                    const {list} = response.data;
                     setData(list)
                     setLoading(false);
                 }
@@ -33,6 +33,10 @@ const FileList = () => {
     //     'Man charged over missing wedding girl.',
     //     'Los Angeles battles huge wildfires.',
     // ];
+    const editFile = (item) => {
+        item.isEdit = true;
+        console.log(item);
+    }
     return (
         <Card title="文件列表"
             // extra={<a href="#">More</a>}
@@ -46,9 +50,16 @@ const FileList = () => {
                 // footer={<div>Footer</div>}
                 bordered
                 dataSource={data}
-                renderItem={(item) => <List.Item  actions={[<a key="list-loadmore-edit">编辑</a>, <a key="list-loadmore-more">删除</a>]}>
-                    {/*<div>{item.name}</div>*/}
-                    <Input size={"small"} placeholder="Basic usage" />
+                renderItem={(item) => <List.Item
+                    actions={[
+                        <a key="list-loadmore-edit" onClick={editFile.bind(this, item)}>编辑</a>,
+                        <a key="list-loadmore-more">删除</a>]}>
+                    {item.isEdit ?
+                        <Input size={"small"}  />
+                        :
+                        item.name
+                    }
+
                 </List.Item>}
             />
         </Card>
