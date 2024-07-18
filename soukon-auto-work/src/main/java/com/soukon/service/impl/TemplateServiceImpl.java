@@ -75,4 +75,18 @@ public class TemplateServiceImpl extends ServiceImpl<TemplateMapper, Template> i
         return ApiResponse.<Template>success().list(list);
     }
 
+    @Override
+    public ApiResponse<Template> templateEdit(int type, Template template) {
+        UserBO user = tokenService.getUser();
+        template.setUserId(user.getUserid());
+        updateById(template);
+        return ApiResponse.success("更新成功");
+    }
+
+    @Override
+    public ApiResponse<Template> templateDel(String templateId) {
+        removeById(templateId);
+        return ApiResponse.success("删除成功");
+    }
+
 }

@@ -48,6 +48,17 @@ public class AutoWorkController {
         return templateService.templateList(type);
     }
 
+    //    查询模板列表
+    @PostMapping("/template/edit")
+    public ApiResponse<Template> templateEdit(@RequestParam("type") int type,@RequestBody Template template) {
+        return templateService.templateEdit(type,template);
+    }
+
+    @PostMapping("/template/del")
+    public ApiResponse<Template> templateDel(@RequestParam("templateId") String templateId) {
+        return templateService.templateDel(templateId);
+    }
+
     //    查询文件模板详情
     @PostMapping("/files/get")
     public ApiResponse<Files> filesGet(@RequestParam("templateId") String templateId) {
@@ -62,9 +73,9 @@ public class AutoWorkController {
     }
 
     //    编辑数据模板
-    @PostMapping("/template/edit")
-    public ApiResponse<Object> templateEdit(@RequestBody List<DataCell> dataCells, @RequestParam("templateId") String templateId) {
-        return dataCellService.templateEdit(dataCells, templateId);
+    @PostMapping("/template/data/edit")
+    public ApiResponse<Object> templateDataEdit(@RequestBody List<DataCell> dataCells, @RequestParam("templateId") String templateId) {
+        return dataCellService.templateDataEdit(dataCells, templateId);
     }
 
     //    查询数据模板

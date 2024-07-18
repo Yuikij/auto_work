@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface DataCellService extends IService<DataCell> {
     List<Double> getValue(DataCell dataCell, JSONObject params);
-    ApiResponse<Object> templateEdit(List<DataCell> dataCells, String templateId);
+    ApiResponse<Object> templateDataEdit(List<DataCell> dataCells, String templateId);
 
     ApiResponse<DataCell> templateGet(String templateId);
 }

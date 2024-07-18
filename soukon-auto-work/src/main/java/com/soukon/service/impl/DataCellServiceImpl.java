@@ -71,7 +71,7 @@ public class DataCellServiceImpl extends ServiceImpl<DataCellMapper, DataCell> i
     }
 
     @Override
-    public ApiResponse<Object> templateEdit(List<DataCell> dataCells, String templateId) {
+    public ApiResponse<Object> templateDataEdit(List<DataCell> dataCells, String templateId) {
         remove(Wrappers.lambdaQuery(DataCell.class).eq(DataCell::getTemplateId, templateId));
         dataCells.forEach(dataCell -> {
             dataCell.setTemplateId(Long.parseLong(templateId));
