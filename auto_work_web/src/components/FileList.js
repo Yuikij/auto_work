@@ -9,13 +9,6 @@ const FileList = () => {
     useEffect(() => {
         getFilePost();
     }, []); // 空数组作为依赖项，确保只在组件挂载时运行一次
-    //  data = [
-    //     'Racing car sprays burning fuel into crowd.',
-    //     'Japanese princess to wed commoner.',
-    //     'Australian walks 100km after outback crash.',
-    //     'Man charged over missing wedding girl.',
-    //     'Los Angeles battles huge wildfires.',
-    // ];
 
     const getFilePost = () => {
         axiosInstance.post('/template/list?type=1')
@@ -27,7 +20,6 @@ const FileList = () => {
                     setData(list)
                     setLoading(false);
                 }
-                // setData(response.data);
             })
             .catch(error => {
                 console.error('Error fetching data:', error);

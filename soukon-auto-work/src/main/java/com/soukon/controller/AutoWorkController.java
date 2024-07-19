@@ -38,7 +38,7 @@ public class AutoWorkController {
 
     //    编辑文件模板
     @PostMapping("/files/edit")
-    public ApiResponse<Object> filesEdit(@RequestBody List<Files> files, @RequestParam("templateId") String templateId) {
+    public ApiResponse<Object> filesEdit(@RequestBody List<Files> files, @RequestParam("fileTemplateId") String templateId) {
         return fileService.templateEdit(files, templateId);
     }
 
@@ -46,6 +46,12 @@ public class AutoWorkController {
     @PostMapping("/template/list")
     public ApiResponse<Template> templateList(@RequestParam("type") int type) {
         return templateService.templateList(type);
+    }
+
+    //    根据文件模板id查询文件模板详情
+    @PostMapping("/files/get")
+    public ApiResponse<Files> filesGet(@RequestParam("fileTemplateId") String fileTemplateId) {
+        return fileService.filesGet(fileTemplateId);
     }
 
     //    查询模板列表
@@ -57,12 +63,6 @@ public class AutoWorkController {
     @PostMapping("/template/del")
     public ApiResponse<Template> templateDel(@RequestParam("templateId") String templateId) {
         return templateService.templateDel(templateId);
-    }
-
-    //    查询文件模板详情
-    @PostMapping("/files/get")
-    public ApiResponse<Files> filesGet(@RequestParam("templateId") String templateId) {
-        return fileService.filesGet(templateId);
     }
 
     //    创建数据模板
@@ -79,12 +79,12 @@ public class AutoWorkController {
     }
 
     //    查询数据模板
-    @PostMapping("/template/get")
+    @PostMapping("/template/data/get")
     public ApiResponse<DataCell> templateGet(@RequestParam("templateId") String templateId) {
         return dataCellService.templateGet(templateId);
     }
 
-    //    执行数据模板
+    //    执行模板
     @PostMapping("/template/execute")
     public ApiResponse<DataCellVO> templateExecute(@RequestParam(value = "files") List<MultipartFile> files, @RequestParam("templateId") String templateId, @RequestParam(value = "params") String params) {
         return templateService.templateExecute(files, templateId, params);

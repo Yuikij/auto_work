@@ -46,5 +46,12 @@ axiosInstance.interceptors.response.use(
 axiosInstance.isSuccess = (response) => {
     return response.status === 200 && response.data.success
 }
+axiosInstance.isSuccess = (response, callback) => {
+    const success = response.status === 200 && response.data.success;
+    if (success && callback) {
+        callback();
+    }
+    return success
+}
 
 export default axiosInstance;
