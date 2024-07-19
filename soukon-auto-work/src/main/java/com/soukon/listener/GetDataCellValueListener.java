@@ -13,23 +13,27 @@ import java.util.concurrent.locks.ReentrantLock;
 public class GetDataCellValueListener extends AnalysisEventListener<Map<Integer, String>> {
 
     private final DataCell dataCell;
-    private final ReentrantLock lock;
-    private final Condition condition;
+//    private final ReentrantLock lock;
+//    private final Condition condition;
     private final List<Double> res;
 
     public GetDataCellValueListener(DataCell dataCell, ReentrantLock lock, Condition condition, List<Double> res) {
         this.dataCell = dataCell;
-        this.lock = lock;
-        this.condition = condition;
+//        this.lock = lock;
+//        this.condition = condition;
         this.res = res;
     }
 
+    public GetDataCellValueListener(DataCell dataCell, List<Double> res) {
+        this.dataCell = dataCell;
+        this.res = res;
+    }
     @Override
     public void invoke(Map<Integer, String> data, AnalysisContext analysisContext) {
         if (dataCell.getColumnIndex() != null && dataCell.getRowIndex() != null) {
             Integer rowIndex = analysisContext.readRowHolder().getRowIndex();
-            if (Objects.equals(rowIndex, dataCell.getRowIndex())) {
-                res.add(Double.parseDouble(data.get(dataCell.getColumnIndex())));
+            if (Objects.equals(rowIndex, dataCell.getRowIndex()-1)) {
+                res.add(Double.parseDouble(data.get(dataCell.getColumnIndex()-1)));
                 returnRes();
             }
             return;
@@ -39,17 +43,17 @@ public class GetDataCellValueListener extends AnalysisEventListener<Map<Integer,
             if (dataCell.getEndIndex() != null && dataCell.getStartIndex() != null) {
                 Integer rowIndex = analysisContext.readRowHolder().getRowIndex();
                 if (rowIndex >= dataCell.getStartIndex() - 1 && rowIndex < dataCell.getEndIndex()) {
-                    res.add(Double.parseDouble(data.get(dataCell.getColumnIndex())));
+                    res.add(Double.parseDouble(data.get(dataCell.getColumnIndex()-1)));
                 }
             } else {
-                res.add(Double.parseDouble(data.get(dataCell.getColumnIndex())));
+                res.add(Double.parseDouble(data.get(dataCell.getColumnIndex()-1)));
             }
             return;
         }
 
         if (dataCell.getRowIndex() != null) {
             Integer rowIndex = analysisContext.readRowHolder().getRowIndex();
-            if (Objects.equals(rowIndex, dataCell.getRowIndex())) {
+            if (Objects.equals(rowIndex, dataCell.getRowIndex()-1)) {
                 if (dataCell.getEndIndex() != null && dataCell.getStartIndex() != null) {
                     data.forEach((k,v)->{
                         if (k >= dataCell.getStartIndex() - 1 && k < dataCell.getEndIndex()) {
@@ -66,12 +70,12 @@ public class GetDataCellValueListener extends AnalysisEventListener<Map<Integer,
     }
 
     private void returnRes() {
-        lock.lock();
-        try {
-            condition.signal();
-        } finally {
-            lock.unlock();
-        }
+//        lock.lock();
+//        try {
+//            condition.signal();
+//        } finally {
+//            lock.unlock();
+//        }
     }
 
     @Override

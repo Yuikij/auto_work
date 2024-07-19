@@ -13,8 +13,8 @@ const Template = () => {
         });
 
 
-        formData.append('templateId', "!23");
-        formData.append('params', "!11");
+        formData.append('templateId', "1811663639102410753");
+        formData.append('params', "{}");
         setUploading(true);
         // const response = axiosInstance.post('/api/upload', formData, {
         //     headers: {

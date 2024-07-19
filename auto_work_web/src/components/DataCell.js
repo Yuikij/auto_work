@@ -98,8 +98,7 @@ const DataCellForm = ({setDataCell}) => {
             .then(response => {
                 if (axiosInstance.isSuccess(response, callBack)) {
                     const {list} = response.data;
-                    list.map(e=>{id:e})
-                    console.log(response.data);
+                    setFileSelectValue(list.map(e => ({label: e.name, value: e.id})))
                 }
             })
             .catch(error => {
@@ -109,6 +108,18 @@ const DataCellForm = ({setDataCell}) => {
 
     const getDataSelect = (callBack) => {
         axiosInstance.post('/template/data/get?templateId=1811663639102410753')
+            .then(response => {
+                if (axiosInstance.isSuccess(response, callBack)) {
+                    console.log(response.data);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    }
+
+    const editTemplateData= (data,callBack) => {
+        axiosInstance.post('/template/data/edit?templateId=1811663639102410753',data)
             .then(response => {
                 if (axiosInstance.isSuccess(response, callBack)) {
                     console.log(response.data);
@@ -201,6 +212,7 @@ const DataCellForm = ({setDataCell}) => {
     }
 
     const saveData = () => {
+
         // 需要判断是否变成函数式了
         let resData;
         if (dataCells.length === 1) {
@@ -208,11 +220,13 @@ const DataCellForm = ({setDataCell}) => {
         } else {
             resData = createScriptDataCell(dataCells, "最终数据", operations.join(""), ScriptTypes.OPERATION)
         }
+
+        editTemplateData([resData])
         console.log(resData);
     }
     const onDataCreate = (values) => {
         console.log('Received values of form: ', values);
-        setGroupDataCells([...groupDataCells, values])
+        setDataCells([...dataCells, values])
         setDataLabels([...dataLabels, values.name])
         setShowData(false)
     }
@@ -240,6 +254,7 @@ const DataCellForm = ({setDataCell}) => {
                        autoFocus: true,
                        htmlType: 'submit',
                    }}
+                   destroyOnClose
                    maskClosable={false}
                    modalRender={(dom) => (
                        <Form
@@ -262,14 +277,13 @@ const DataCellForm = ({setDataCell}) => {
                     <Col span={8}>
                         <Form.Item label={"选择数据类型"}>
                             <Select
-                                style={{width: '300px'}}
-                                allowClear
-                                options={dataTypeEnum}
-                                onChange={e => {
-                                    setDataType(e)
-                                }
-                                }
-                            />
+                            style={{width: '300px'}}
+                            allowClear
+                            options={dataTypeEnum}
+                            onChange={e => {
+                                setDataType(e)}
+                            }
+                        />
                         </Form.Item>
                     </Col>
                     <Col span={8}>
@@ -289,7 +303,11 @@ const DataCellForm = ({setDataCell}) => {
                     [<Row>
                         <Col span={8}>
                             <Form.Item label={"选择文件"} name="sourceId">
-                                <Input style={{width: "300px"}}/>
+                                <Select
+                                    style={{width: '300px'}}
+                                    allowClear
+                                    options={fileSelectValue}
+                                />
                             </Form.Item>
                         </Col>
                         <Col span={8}>
@@ -300,12 +318,12 @@ const DataCellForm = ({setDataCell}) => {
                     </Row>,
                         <Row>
                             <Col span={8}>
-                                <Form.Item label={"行号"}>
+                                <Form.Item label={"行号"} name="rowIndex">
                                     <InputNumber style={{width: "300px"}}/>
                                 </Form.Item>
                             </Col>
                             <Col span={8}>
-                                <Form.Item label={"列号"}>
+                                <Form.Item label={"列号"} name="columnIndex">
                                     <InputNumber style={{width: "300px"}}/>
                                 </Form.Item>
                             </Col>

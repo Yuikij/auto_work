@@ -13,7 +13,7 @@ import java.util.Objects;
 @TableName(value = "data_cell", autoResultMap = true)
 // script和sourceId只会存在一种
 public class DataCell {
-    private long id;
+    private Long id;
     private String name;
     //    通过sourceId找到对应的文件或者数据集
     //    文件直接读
@@ -32,7 +32,7 @@ public class DataCell {
     private Integer startIndex;
     private Integer endIndex;
     //    是否是最终结果
-    private boolean isRes;
+    private boolean res;
     //    所属的模板id
     private long templateId;
     //具体数值
@@ -50,11 +50,11 @@ public class DataCell {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DataCell dataCell = (DataCell) o;
-        return id == dataCell.id && isRes == dataCell.isRes && templateId == dataCell.templateId && Double.compare(specificValue, dataCell.specificValue) == 0 && type == dataCell.type && Objects.equals(name, dataCell.name) && Objects.equals(sourceId, dataCell.sourceId) && Objects.equals(rowIndex, dataCell.rowIndex) && Objects.equals(columnIndex, dataCell.columnIndex) && Objects.equals(sheet, dataCell.sheet) && Objects.equals(selectIndex, dataCell.selectIndex) && Objects.equals(script, dataCell.script) && Objects.equals(startIndex, dataCell.startIndex) && Objects.equals(endIndex, dataCell.endIndex) && Objects.equals(paramName, dataCell.paramName) && Objects.equals(createdTime, dataCell.createdTime) && Objects.equals(updatedTime, dataCell.updatedTime);
+        return id == dataCell.id && res == dataCell.res && templateId == dataCell.templateId && Double.compare(specificValue, dataCell.specificValue) == 0 && type == dataCell.type && Objects.equals(name, dataCell.name) && Objects.equals(sourceId, dataCell.sourceId) && Objects.equals(rowIndex, dataCell.rowIndex) && Objects.equals(columnIndex, dataCell.columnIndex) && Objects.equals(sheet, dataCell.sheet) && Objects.equals(selectIndex, dataCell.selectIndex) && Objects.equals(script, dataCell.script) && Objects.equals(startIndex, dataCell.startIndex) && Objects.equals(endIndex, dataCell.endIndex) && Objects.equals(paramName, dataCell.paramName) && Objects.equals(createdTime, dataCell.createdTime) && Objects.equals(updatedTime, dataCell.updatedTime);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, sourceId, rowIndex, columnIndex, sheet, selectIndex, script, startIndex, endIndex, isRes, templateId, specificValue, paramName, type, createdTime, updatedTime);
+        return Objects.hash(id, name, sourceId, rowIndex, columnIndex, sheet, selectIndex, script, startIndex, endIndex, res, templateId, specificValue, paramName, type, createdTime, updatedTime);
     }
 }

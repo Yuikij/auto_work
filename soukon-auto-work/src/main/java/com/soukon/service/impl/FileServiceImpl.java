@@ -47,18 +47,18 @@ public class FileServiceImpl extends ServiceImpl<FilesMapper, Files> implements 
         Map<Long, InputStream> inputStreamMap = threadLocalMap.get();
         Long sourceId = dataCell.getSourceId();
         List<Double> res = new ArrayList<>();
-        ReentrantLock lock = new ReentrantLock();
-        Condition condition = lock.newCondition();
-        try {
-            lock.lock();
-            condition.await();
-        } catch (InterruptedException e) {
-            log.error("等待解析文件出错", e);
-        } finally {
-            lock.unlock();
-        }
+//        ReentrantLock lock = new ReentrantLock();
+//        Condition condition = lock.newCondition();
+//        try {
+//            lock.lock();
+//            condition.await();
+//        } catch (InterruptedException e) {
+//            log.error("等待解析文件出错", e);
+//        } finally {
+//            lock.unlock();
+//        }
         InputStream inputStream = inputStreamMap.get(sourceId);
-        EasyExcel.read(inputStream, new GetDataCellValueListener(dataCell, lock, condition, res)).sheet(dataCell.getSheet()).doRead();
+        EasyExcel.read(inputStream, new GetDataCellValueListener(dataCell, res)).sheet(dataCell.getSheet()).doRead();
         return res;
     }
 

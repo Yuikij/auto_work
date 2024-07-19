@@ -78,7 +78,7 @@ public class AutoWorkController {
         return dataCellService.templateDataEdit(dataCells, templateId);
     }
 
-    //    查询数据模板
+    //    查询数据模板详情
     @PostMapping("/template/data/get")
     public ApiResponse<DataCell> templateGet(@RequestParam("templateId") String templateId) {
         return dataCellService.templateGet(templateId);
