@@ -5,8 +5,6 @@ import EditList from "./EditList";
 
 const FileList = () => {
     const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [isAdd, setIsAdd] = useState(false);
 
     useEffect(() => {
         getFilePost();
@@ -20,12 +18,10 @@ const FileList = () => {
                 if (axiosInstance.isSuccess(response)) {
                     const {list} = response.data;
                     setData(list)
-                    setLoading(false);
                 }
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
-                setLoading(false);
             });
     }
 
@@ -42,7 +38,6 @@ const FileList = () => {
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
-                setLoading(false);
             });
     }
 
@@ -59,7 +54,6 @@ const FileList = () => {
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
-                setLoading(false);
             });
     }
 
@@ -94,7 +88,6 @@ const FileList = () => {
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
-                setLoading(false);
             });
     };
 
@@ -105,10 +98,13 @@ const FileList = () => {
 
     return (
         <div>
-            <EditList title={"文件列表"} dataList={data} onEdit={handleBlur} onDelete={delFile} onAdd={handleAddBlur}/>
+            <Card title={"文件列表"}>
+                <EditList title={"文件列表"} dataList={data} onEdit={handleBlur} onDelete={delFile} onAdd={handleAddBlur}/>
+                <EditList title={""} dataList={data} onEdit={handleBlur} onDelete={delFile} onAdd={handleAddBlur}/>
+            </Card>
+
+
         </div>
-
-
     );
 };
 export default FileList;

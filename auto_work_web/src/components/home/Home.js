@@ -20,26 +20,28 @@ const Home = () => {
     //     });
     const headerStyle = {
         textAlign: 'center',
-        color: '#fff',
+        // color: '#fff',
         paddingInline: 48,
         lineHeight: '64px',
-        backgroundColor: '#4096ff',
+        // backgroundColor: '#4096ff',
     };
     const contentStyle = {
         textAlign: 'center',
         minHeight: 120,
         lineHeight: '120px',
-        color: '#fff',
-        backgroundColor: '#0958d9',
+        // color: '#fff',
+        // backgroundColor: '#0958d9',
     };
     const siderStyle = {
         textAlign: 'center',
         lineHeight: '120px',
+        color: '#000000',
+        backgroundColor: '#ffffff',
     };
     const footerStyle = {
         textAlign: 'center',
-        color: '#fff',
-        backgroundColor: '#4096ff',
+        // color: '#fff',
+        // backgroundColor: '#4096ff',
     };
     const layoutStyle = {
         minHeight: "100vh"

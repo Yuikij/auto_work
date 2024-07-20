@@ -29,8 +29,8 @@ const EditList = ({title, onDelete, onEdit, onAdd, dataList}) => {
 
     return (
         <div>
-            <Card title={title}
-                  style={{}}>
+            {/*<Card title={title}*/}
+            {/*      style={{}}>*/}
                 <List
                     size="small"
                     header={
@@ -54,10 +54,9 @@ const EditList = ({title, onDelete, onEdit, onAdd, dataList}) => {
                             :
                             item.name
                         }
-
                     </List.Item>}
                 />
-            </Card>
+            {/*</Card>*/}
         </div>
 
 
