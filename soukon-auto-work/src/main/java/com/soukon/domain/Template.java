@@ -11,5 +11,5 @@ public class Template {
     private String name;
     //    文件1数据2
     private int type;
-    private int fileTemplateId;
+    private Long fileTemplateId;
 }

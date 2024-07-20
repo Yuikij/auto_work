@@ -1,10 +1,24 @@
 import React, {useState} from 'react';
-import {Form, Input, Button, Dropdown, Space, Menu, Tag, Card, Modal, Select, Row, Col, InputNumber} from 'antd';
+import {
+    Form,
+    Input,
+    Button,
+    Dropdown,
+    Space,
+    Menu,
+    Tag,
+    Card,
+    Modal,
+    Select,
+    Row,
+    Col,
+    InputNumber,
+    Switch
+} from 'antd';
 import {
     PlusCircleOutlined,
     LoadingOutlined, SearchOutlined,
     SettingFilled,
-    SmileOutlined,
     SyncOutlined, CloseCircleOutlined,
 } from '@ant-design/icons';
 import {evaluate} from 'mathjs';
@@ -31,24 +45,11 @@ const operationEnum = [
 
 const dataTypeEnum = [
     {value: 1, label: '文件'},
-    {value: 2, label: '计算'},
+    // {value: 2, label: '计算'},
     {value: 3, label: '其他数据单元'},
     {value: 4, label: '参数'},
     {value: 5, label: '具体值'},
 ]
-
-
-const DataCell = () => {
-    return <Card
-        title="表1分组"
-        // extra={<a href="#">More</a>}
-        style={{
-            width: '80%',
-        }}
-    >
-    </Card>
-}
-
 
 const ScriptTypes = {
     GROUP: 1,
@@ -88,8 +89,9 @@ const DataCellForm = ({setDataCell}) => {
             script: {
                 dataCells: dataCellArr,
                 operationScript: operationScript,
-                type: type,
-            }
+                scriptType: type,
+            },
+            type: editingType
         }
     }
 
@@ -110,6 +112,8 @@ const DataCellForm = ({setDataCell}) => {
         axiosInstance.post('/template/data/get?templateId=1811663639102410753')
             .then(response => {
                 if (axiosInstance.isSuccess(response, callBack)) {
+                    const {list} = response.data;
+                    setDataSelectValue(list.map(e => ({label: e.name, value: e.id})))
                     console.log(response.data);
                 }
             })
@@ -118,8 +122,8 @@ const DataCellForm = ({setDataCell}) => {
             });
     }
 
-    const editTemplateData= (data,callBack) => {
-        axiosInstance.post('/template/data/edit?templateId=1811663639102410753',data)
+    const editTemplateData = (data, callBack) => {
+        axiosInstance.post('/template/data/edit?templateId=1811663639102410753', data)
             .then(response => {
                 if (axiosInstance.isSuccess(response, callBack)) {
                     console.log(response.data);
@@ -161,11 +165,14 @@ const DataCellForm = ({setDataCell}) => {
 
     // 生成一个cell
     const handleGroupOk = () => {
+        const size = dataCells.length;
         setDataCells([...dataCells, createScriptDataCell(
             groupDataCells, groupName, operationScript, editingType
         )])
-        console.log("dataLabels:", dataLabels);
+        setOperations([...operations, ("f" + size)])
+        console.log("groupDataCells:", groupDataCells);
         setDataLabels([...dataLabels, groupName])
+        setShowGroup(false)
         clearGroupData()
     }
 
@@ -219,13 +226,18 @@ const DataCellForm = ({setDataCell}) => {
             resData = dataCells[0];
         } else {
             resData = createScriptDataCell(dataCells, "最终数据", operations.join(""), ScriptTypes.OPERATION)
+            resData.res = 1;
+            resData.type = 2;
         }
 
         editTemplateData([resData])
+        setDataCell && setDataCell(resData);
         console.log(resData);
     }
     const onDataCreate = (values) => {
         console.log('Received values of form: ', values);
+        const size = dataCells.length;
+        setOperations([...operations, ("f" + size)])
         setDataCells([...dataCells, values])
         setDataLabels([...dataLabels, values.name])
         setShowData(false)
@@ -242,7 +254,11 @@ const DataCellForm = ({setDataCell}) => {
                     </Form.Item>
                 </Form>
                 {
-                    groupDataCells.map(e => <DataCellForm/>)
+                    groupDataCells.map(e => <DataCellForm setDataCell={(data) => {
+                        const newData = [...groupDataCells];
+                        newData[newData.length - 1] = data;
+                        setGroupDataCells(newData)
+                    }}/>)
                 }
                 <Button type="primary"
                         onClick={addGroupDataCells}>{"添加" + ScriptTypesLabel[editingType] + "的数据单元"}</Button>
@@ -272,18 +288,18 @@ const DataCellForm = ({setDataCell}) => {
                    )}
             >
 
-                {/*<Form form={form} onFinish={(values) => onDataCreate(values)}>*/}
                 <Row>
                     <Col span={8}>
-                        <Form.Item label={"选择数据类型"}>
+                        <Form.Item label={"选择数据类型"} name="type">
                             <Select
-                            style={{width: '300px'}}
-                            allowClear
-                            options={dataTypeEnum}
-                            onChange={e => {
-                                setDataType(e)}
-                            }
-                        />
+                                style={{width: '300px'}}
+                                allowClear
+                                options={dataTypeEnum}
+                                onChange={e => {
+                                    setDataType(e)
+                                }
+                                }
+                            />
                         </Form.Item>
                     </Col>
                     <Col span={8}>
@@ -347,7 +363,11 @@ const DataCellForm = ({setDataCell}) => {
                 }
                 {dataType === 3 &&
                     <Form.Item label={"选择其他数据单元"} name="sourceId">
-                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
+                        <Select
+                            style={{width: '300px'}}
+                            allowClear
+                            options={dataSelectValue}
+                        />
                     </Form.Item>
                 }
                 {dataType === 4 &&
@@ -360,6 +380,9 @@ const DataCellForm = ({setDataCell}) => {
                         <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
                     </Form.Item>
                 }
+                <Form.Item label={"是否是最终结果"} name="res">
+                    <Switch defaultChecked/>
+                </Form.Item>
                 {/*</Form>*/}
             </Modal>
             {

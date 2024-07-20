@@ -30,7 +30,7 @@ public class AutoWorkController {
     private DataCellService dataCellService;
 
     //    创建文件模板
-    @PostMapping("/files/add")
+    @PostMapping("/template/files/add")
     public ApiResponse<Object> filesAdd(@RequestBody Template template) {
         template.setType(1);
         return templateService.templateAdd(template);

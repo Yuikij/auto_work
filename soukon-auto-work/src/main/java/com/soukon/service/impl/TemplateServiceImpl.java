@@ -15,6 +15,7 @@ import com.soukon.mapper.TemplateMapper;
 import com.soukon.service.DataCellService;
 import com.soukon.service.FileService;
 import com.soukon.service.TemplateService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @Service
+@Slf4j
 public class TemplateServiceImpl extends ServiceImpl<TemplateMapper, Template> implements TemplateService {
     @Autowired
     private DataCellService dataCellService;
@@ -46,6 +48,7 @@ public class TemplateServiceImpl extends ServiceImpl<TemplateMapper, Template> i
             return dataCellVO;
         }).toList();
         DataCellServiceImpl.threadLocalMap.remove();
+        log.info("计算结果:{}", res);
         return ApiResponse.<DataCellVO>success().list(res);
     }
 

@@ -1,31 +1,26 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Card, Col, Dropdown, Input, List, message, Row, Tree} from 'antd';
 import axiosInstance from "../utils/request";
 import EditList from "./EditList";
 
-const FileList = () => {
+const TemplateList = () => {
     const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [isAdd, setIsAdd] = useState(false);
 
     useEffect(() => {
         getFilePost();
     }, []); // 空数组作为依赖项，确保只在组件挂载时运行一次
 
     const getFilePost = () => {
-        axiosInstance.post('/template/list?type=1')
+        axiosInstance.post('/template/list?type=2')
             .then(response => {
                 console.log(response);
                 console.log(axiosInstance.isSuccess(response));
                 if (axiosInstance.isSuccess(response)) {
                     const {list} = response.data;
                     setData(list)
-                    setLoading(false);
                 }
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
-                setLoading(false);
             });
     }
 
@@ -42,12 +37,11 @@ const FileList = () => {
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
-                setLoading(false);
             });
     }
 
     const editFilePost = (item, callBack) => {
-        axiosInstance.post('/template/edit?type=1', {...item})
+        axiosInstance.post('/template/edit?type=2', {...item})
             .then(response => {
                 console.log(response);
                 console.log(axiosInstance.isSuccess(response));
@@ -59,20 +53,8 @@ const FileList = () => {
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
-                setLoading(false);
             });
     }
-
-
-    const editFile = (item, e) => {
-        const newData = data.map(d => {
-            if (d.id === item.id) {
-                return {...d, isEdit: !d.isEdit};
-            }
-            return d;
-        });
-        setData(newData);
-    };
 
     const delFile = (item, e) => {
         delFilePost(item.id, getFilePost)
@@ -94,7 +76,6 @@ const FileList = () => {
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
-                setLoading(false);
             });
     };
 
@@ -105,10 +86,10 @@ const FileList = () => {
 
     return (
         <div>
-            <EditList title={"文件列表"} dataList={data} onEdit={handleBlur} onDelete={delFile} onAdd={handleAddBlur}/>
+            <EditList title={"模板列表"} dataList={data} onEdit={handleBlur} onDelete={delFile} onAdd={handleAddBlur}/>
         </div>
 
 
     );
 };
-export default FileList;
+export default TemplateList;
