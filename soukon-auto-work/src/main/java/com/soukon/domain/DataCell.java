@@ -50,7 +50,7 @@ public class DataCell {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DataCell dataCell = (DataCell) o;
-        return id == dataCell.id && res == dataCell.res && templateId == dataCell.templateId && Double.compare(specificValue, dataCell.specificValue) == 0 && type == dataCell.type && Objects.equals(name, dataCell.name) && Objects.equals(sourceId, dataCell.sourceId) && Objects.equals(rowIndex, dataCell.rowIndex) && Objects.equals(columnIndex, dataCell.columnIndex) && Objects.equals(sheet, dataCell.sheet) && Objects.equals(selectIndex, dataCell.selectIndex) && Objects.equals(script, dataCell.script) && Objects.equals(startIndex, dataCell.startIndex) && Objects.equals(endIndex, dataCell.endIndex) && Objects.equals(paramName, dataCell.paramName) && Objects.equals(createdTime, dataCell.createdTime) && Objects.equals(updatedTime, dataCell.updatedTime);
+        return Objects.equals(id, dataCell.id) && res == dataCell.res && templateId == dataCell.templateId && Double.compare(specificValue, dataCell.specificValue) == 0 && type == dataCell.type && Objects.equals(name, dataCell.name) && Objects.equals(sourceId, dataCell.sourceId) && Objects.equals(rowIndex, dataCell.rowIndex) && Objects.equals(columnIndex, dataCell.columnIndex) && Objects.equals(sheet, dataCell.sheet) && Objects.equals(selectIndex, dataCell.selectIndex) && Objects.equals(script, dataCell.script) && Objects.equals(startIndex, dataCell.startIndex) && Objects.equals(endIndex, dataCell.endIndex) && Objects.equals(paramName, dataCell.paramName) && Objects.equals(createdTime, dataCell.createdTime) && Objects.equals(updatedTime, dataCell.updatedTime);
     }
 
     @Override
