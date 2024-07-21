@@ -1,18 +1,36 @@
-import {Button, message, Space, Table, Tag, Upload} from "antd";
+import {Button, Card, Divider, message, Modal, Space, Table, Tag, Upload} from "antd";
 import {UploadOutlined} from "@ant-design/icons";
-import {useState} from "react";
+import React, {useEffect, useState} from "react";
 import axiosInstance from "../utils/request";
+import {dataTypeMap} from "../enums/DataEnums";
+import DataCell from "./DataCell";
+import EditList from "./EditList";
 
 const Template = () => {
     const [fileList, setFileList] = useState([]);
     const [uploading, setUploading] = useState(false);
+    const [dataCells, setDataCells] = useState(false);
+
+    useEffect(() => {
+        getData();
+    }, []); // 空数组作为依赖项，确保只在组件挂载时运行一次
+    const getData = () => {
+        axiosInstance.post('/template/data/get?templateId=1811663639102410753')
+            .then(response => {
+                if (axiosInstance.isSuccess(response)) {
+                    console.log(response, "getData");
+                    setDataCells(response.data.list);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    }
     const handleUpload = () => {
         const formData = new FormData();
         fileList.forEach((file) => {
             formData.append('files', file);
         });
-
-
         formData.append('templateId', "1811663639102410753");
         formData.append('params', "{}");
         setUploading(true);
@@ -26,9 +44,11 @@ const Template = () => {
         //     }
         // });
         // You can use any AJAX library you like
-        axiosInstance.post('/template/execute', formData,{  headers: {
+        axiosInstance.post('/template/execute', formData, {
+            headers: {
                 'Content-Type': 'multipart/form-data'
-            }})
+            }
+        })
             .then((res) => res.json())
             .then(() => {
                 setFileList([]);
@@ -54,84 +74,67 @@ const Template = () => {
             return false;
         },
         fileList,
-        multiple:true
+        multiple: true
 
     };
 
-    const columns = [
+    const dataColumns = [
         {
-            title: 'Name',
+            title: '名称',
             dataIndex: 'name',
-            key: 'name',
-            render: (text) => <a>{text}</a>,
+            key: 'name'
         },
         {
-            title: 'Age',
-            dataIndex: 'age',
-            key: 'age',
+            title: '类型',
+            dataIndex: 'type',
+            key: 'type',
+            render: (type) => dataTypeMap[type],
         },
         {
-            title: 'Address',
-            dataIndex: 'address',
-            key: 'address',
+            title: '是否执行',
+            dataIndex: 'res',
+            key: 'res',
+            render: (res) => res ? '是' : '否',
         },
         {
-            title: 'Tags',
-            key: 'tags',
-            dataIndex: 'tags',
-            render: (_, { tags }) => (
-                <>
-                    {tags.map((tag) => {
-                        let color = tag.length > 5 ? 'geekblue' : 'green';
-                        if (tag === 'loser') {
-                            color = 'volcano';
-                        }
-                        return (
-                            <Tag color={color} key={tag}>
-                                {tag.toUpperCase()}
-                            </Tag>
-                        );
-                    })}
-                </>
-            ),
+            title: '最终结果',
+            dataIndex: 'resData',
+            key: 'resData',
+            //render: (res) => res ? '是' : '否',
         },
         {
-            title: 'Action',
+            title: '操作',
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <a>Invite {record.name}</a>
-                    <a>Delete</a>
+                    <a>编辑</a>
+                    <a>删除</a>
                 </Space>
             ),
         },
-    ];
-    const data = [
-        {
-            key: '1',
-            name: 'John Brown',
-            age: 32,
-            address: 'New York No. 1 Lake Park',
-            tags: ['nice', 'developer'],
-        },
-        {
-            key: '2',
-            name: 'Jim Green',
-            age: 42,
-            address: 'London No. 1 Lake Park',
-            tags: ['loser'],
-        },
-        {
-            key: '3',
-            name: 'Joe Black',
-            age: 32,
-            address: 'Sydney No. 1 Lake Park',
-            tags: ['cool', 'teacher'],
-        },
-    ];
+    ]
+
+    const cardStyle = {
+        margin: '15px'
+    }
+
     return (
         <>
-            <Table columns={columns} dataSource={data} />
+
+            <Card style={cardStyle}>
+                <Card title={"参数定义"}>
+                </Card>
+               执行
+            </Card>
+            <Card style={cardStyle}>
+                <DataCell/>
+            </Card>
+            <Card title={'模版数据集'} style={cardStyle}>
+                <Table columns={dataColumns} dataSource={dataCells}/>
+            </Card>
+            <Modal>
+
+            </Modal>
             {/*<Upload {...props}>*/}
             {/*    <Button icon={<UploadOutlined />}>Select File</Button>*/}
             {/*</Upload>*/}

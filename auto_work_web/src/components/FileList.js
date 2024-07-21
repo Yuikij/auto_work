@@ -1,13 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Card, Col, Dropdown, Input, List, message, Row, Tree} from 'antd';
+import {Button, Card, Col, Divider, Dropdown, Input, List, message, Row, Tree} from 'antd';
 import axiosInstance from "../utils/request";
 import EditList from "./EditList";
 
 const FileList = () => {
     const [data, setData] = useState([]);
+    const [detailData, setDetailData] = useState([]);
 
     useEffect(() => {
         getFilePost();
+        getFileDetailPost();
     }, []); // 空数组作为依赖项，确保只在组件挂载时运行一次
 
     const getFilePost = () => {
@@ -18,6 +20,21 @@ const FileList = () => {
                 if (axiosInstance.isSuccess(response)) {
                     const {list} = response.data;
                     setData(list)
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    }
+
+    const getFileDetailPost = () => {
+        axiosInstance.post('/files/get?fileTemplateId=1811663639102410753')
+            .then(response => {
+                console.log(response);
+                console.log(axiosInstance.isSuccess(response));
+                if (axiosInstance.isSuccess(response)) {
+                    const {list} = response.data;
+                    setDetailData(list)
                 }
             })
             .catch(error => {
@@ -76,6 +93,10 @@ const FileList = () => {
         saveFile(item, e);
     };
 
+    const onDetailEdit = (item, e) => {
+        saveFile(item, e);
+    };
+
     const handleAddBlur = (e) => {
         const name = e.target.value;
         axiosInstance.post('/template/files/add', {name})
@@ -99,8 +120,9 @@ const FileList = () => {
     return (
         <div>
             <Card title={"文件列表"}>
-                <EditList title={"文件列表"} dataList={data} onEdit={handleBlur} onDelete={delFile} onAdd={handleAddBlur}/>
-                <EditList title={""} dataList={data} onEdit={handleBlur} onDelete={delFile} onAdd={handleAddBlur}/>
+                <EditList dataList={data} onEdit={handleBlur} onDelete={delFile} onAdd={handleAddBlur}/>
+                <Divider>文件列表详情</Divider>
+                <EditList dataList={detailData} onEdit={onDetailEdit} onDelete={delFile} onAdd={handleAddBlur}/>
             </Card>
 
 

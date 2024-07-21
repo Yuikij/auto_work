@@ -20,7 +20,8 @@ const Home = () => {
     //     });
     const headerStyle = {
         textAlign: 'center',
-        // color: '#fff',
+        color: '#fff',
+
         paddingInline: 48,
         lineHeight: '64px',
         // backgroundColor: '#4096ff',
@@ -50,7 +51,7 @@ const Home = () => {
         {/*<FileList/>*/}
         {/*<TemplateList/>*/}
         <Layout style={layoutStyle}>
-            <Header style={headerStyle}>Header</Header>
+            <Header style={headerStyle}>AUTO WORK</Header>
             <Layout>
                 <Sider width="30%" style={siderStyle}>
                     <TemplateList/>

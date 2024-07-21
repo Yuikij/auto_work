@@ -16,52 +16,12 @@ import {
     Switch
 } from 'antd';
 import {
-    PlusCircleOutlined,
-    LoadingOutlined, SearchOutlined,
-    SettingFilled,
-    SyncOutlined, CloseCircleOutlined,
+    PlusCircleOutlined,CloseCircleOutlined,
 } from '@ant-design/icons';
-import {evaluate} from 'mathjs';
 import axiosInstance from "../utils/request";
+import {ScriptTypes, ScriptTypesLabel, dataTypeList, operationEnum} from "../enums/DataEnums";
 
-const FunctionTypes = {
-    sum: "连加",
-    multi: "连乘",
-}
 
-const operationEnum = [
-        {key: "+", label: "+"},
-        {key: "-", label: "-"},
-        {key: "*", label: "*"},
-        {key: "/", label: "/"},
-        {key: "(", label: "("},
-        {key: ")", label: ")"},
-        {key: "group", label: "分组"},
-        {key: "sum", label: "连加"},
-        {key: "multi", label: "连乘"},
-        {key: "data", label: "选择数据单元"},
-    ]
-;
-
-const dataTypeEnum = [
-    {value: 1, label: '文件'},
-    // {value: 2, label: '计算'},
-    {value: 3, label: '其他数据单元'},
-    {value: 4, label: '参数'},
-    {value: 5, label: '具体值'},
-]
-
-const ScriptTypes = {
-    GROUP: 1,
-    FUNCTION: 2,
-    OPERATION: 3
-}
-
-const ScriptTypesLabel = {
-    1: "分组",
-    2: "函数",
-    3: "运算"
-}
 const DataCellForm = ({setDataCell}) => {
 
     const [dataCells, setDataCells] = useState([]);
@@ -250,7 +210,7 @@ const DataCellForm = ({setDataCell}) => {
                    maskClosable={false}>
                 <Form>
                     <Form.Item label={ScriptTypesLabel[editingType] + "名称"}>
-                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
+                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "20vw"}}/>
                     </Form.Item>
                 </Form>
                 {
@@ -292,9 +252,9 @@ const DataCellForm = ({setDataCell}) => {
                     <Col span={8}>
                         <Form.Item label={"选择数据类型"} name="type">
                             <Select
-                                style={{width: '300px'}}
+                                style={{width: '20vw'}}
                                 allowClear
-                                options={dataTypeEnum}
+                                options={dataTypeList}
                                 onChange={e => {
                                     setDataType(e)
                                 }
@@ -310,7 +270,7 @@ const DataCellForm = ({setDataCell}) => {
                                            message: '请填写名称',
                                        },
                                    ]}>
-                            <Input style={{width: "300px"}}/>
+                            <Input style={{width: "20vw"}}/>
                         </Form.Item>
                     </Col>
                 </Row>
@@ -320,7 +280,7 @@ const DataCellForm = ({setDataCell}) => {
                         <Col span={8}>
                             <Form.Item label={"选择文件"} name="sourceId">
                                 <Select
-                                    style={{width: '300px'}}
+                                    style={{width: '20vw'}}
                                     allowClear
                                     options={fileSelectValue}
                                 />
@@ -328,19 +288,19 @@ const DataCellForm = ({setDataCell}) => {
                         </Col>
                         <Col span={8}>
                             <Form.Item label={"输入表名"}>
-                                <Input style={{width: "300px"}}/>
+                                <Input style={{width: "20vw"}}/>
                             </Form.Item>
                         </Col>
                     </Row>,
                         <Row>
                             <Col span={8}>
                                 <Form.Item label={"行号"} name="rowIndex">
-                                    <InputNumber style={{width: "300px"}}/>
+                                    <InputNumber style={{width: "20vw"}}/>
                                 </Form.Item>
                             </Col>
                             <Col span={8}>
                                 <Form.Item label={"列号"} name="columnIndex">
-                                    <InputNumber style={{width: "300px"}}/>
+                                    <InputNumber style={{width: "20vw"}}/>
                                 </Form.Item>
                             </Col>
                         </Row>
@@ -351,12 +311,12 @@ const DataCellForm = ({setDataCell}) => {
                     <Row>
                         <Col span={8}>
                             <Form.Item label={"选择起始索引"} name="startIndex">
-                                <InputNumber style={{width: "300px"}}/>
+                                <InputNumber style={{width: "20vw"}}/>
                             </Form.Item>
                         </Col>
                         <Col span={8}>
                             <Form.Item label={"选择终止索引"} name="endIndex">
-                                <InputNumber style={{width: "300px"}}/>
+                                <InputNumber style={{width: "20vw"}}/>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -364,7 +324,7 @@ const DataCellForm = ({setDataCell}) => {
                 {dataType === 3 &&
                     <Form.Item label={"选择其他数据单元"} name="sourceId">
                         <Select
-                            style={{width: '300px'}}
+                            style={{width: '20vw'}}
                             allowClear
                             options={dataSelectValue}
                         />
@@ -372,12 +332,12 @@ const DataCellForm = ({setDataCell}) => {
                 }
                 {dataType === 4 &&
                     <Form.Item label={"选择参数"} name="paramName">
-                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
+                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "20vw"}}/>
                     </Form.Item>
                 }
                 {dataType === 5 &&
                     <Form.Item label={"填入数值"} name="specificValue">
-                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "300px"}}/>
+                        <Input onChange={e => setGroupName(e.target.value)} style={{width: "20vw"}}/>
                     </Form.Item>
                 }
                 <Form.Item label={"是否是最终结果"} name="res">
@@ -399,7 +359,7 @@ const DataCellForm = ({setDataCell}) => {
             }} menu={{items: operationEnum, onClick: handleMenuClick}} placement="bottomLeft">
                 <Button icon={<PlusCircleOutlined/>}/>
             </Dropdown>
-            <Button onClick={saveData} style={{marginLeft: "10px"}}>确定</Button>
+            <Button onClick={saveData} style={{marginLeft: "10px"}}>添加数据集</Button>
         </div>
 
     );

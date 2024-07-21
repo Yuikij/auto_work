@@ -26,13 +26,17 @@ const EditList = ({title, onDelete, onEdit, onAdd, dataList}) => {
         onAdd(e);
         setIsAdd(false)
     }
-
+    const listStyle = {
+        borderRadius: '0px',
+    };
     return (
         <div>
             {/*<Card title={title}*/}
             {/*      style={{}}>*/}
                 <List
                     size="small"
+                    style={listStyle}
+
                     header={
                         <Row justify="space-between">
                             <Col>
@@ -50,7 +54,9 @@ const EditList = ({title, onDelete, onEdit, onAdd, dataList}) => {
                             <a key="list-loadmore-edit" onClick={editItem.bind(this, item)}>编辑</a>,
                             <a key="list-loadmore-more" onClick={onDelete.bind(this, item)}>删除</a>]}>
                         {item.isEdit ?
-                            <Input onBlur={onEdit.bind(this, item)} size={"small"}/>
+                            <Input onBlur={onEdit.bind(this, item)}
+                                   placeholder={item.name}
+                                   size={"small"}/>
                             :
                             item.name
                         }

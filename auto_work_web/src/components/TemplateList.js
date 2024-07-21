@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import axiosInstance from "../utils/request";
 import EditList from "./EditList";
+import {Card} from "antd";
 
 const TemplateList = () => {
     const [data, setData] = useState([]);
@@ -86,7 +87,9 @@ const TemplateList = () => {
 
     return (
         <div>
-            <EditList title={"模板列表"} dataList={data} onEdit={handleBlur} onDelete={delFile} onAdd={handleAddBlur}/>
+            <Card title={"模板列表"}>
+                <EditList title={"模板列表"} dataList={data} onEdit={handleBlur} onDelete={delFile} onAdd={handleAddBlur}/>
+            </Card>
         </div>
 
 
