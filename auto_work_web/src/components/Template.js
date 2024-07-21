@@ -1,10 +1,11 @@
-import {Button, Card, Divider, message, Modal, Space, Table, Tag, Upload} from "antd";
+import {Button, Card, Col, Divider, message, Modal, Row, Space, Table, Tag, Upload} from "antd";
 import {UploadOutlined} from "@ant-design/icons";
 import React, {useEffect, useState} from "react";
 import axiosInstance from "../utils/request";
 import {dataTypeMap} from "../enums/DataEnums";
 import DataCell from "./DataCell";
 import EditList from "./EditList";
+import KVAdd from "./KVAdd";
 
 const Template = () => {
     const [fileList, setFileList] = useState([]);
@@ -118,14 +119,20 @@ const Template = () => {
         margin: '15px'
     }
 
+    const cardStyleCol = {
+        margin: '15px 15px 0px 15px'
+    }
+
     return (
         <>
+            <Row>
+                <Col span={12}>
+                    <Card style={cardStyleCol} title={"参数定义"}>
+                    </Card>
+                </Col>
+                <Col span={12}><KVAdd/></Col>
+            </Row>
 
-            <Card style={cardStyle}>
-                <Card title={"参数定义"}>
-                </Card>
-               执行
-            </Card>
             <Card style={cardStyle}>
                 <DataCell/>
             </Card>
