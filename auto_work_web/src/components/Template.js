@@ -109,7 +109,9 @@ const Template = () => {
             render: (_, record) => (
                 <Space size="middle">
                     <a>编辑</a>
-                    <a>删除</a>
+                    <a onClick={()=>{
+                        delTemplateData(record.id,getData)
+                    }}>删除</a>
                 </Space>
             ),
         },
@@ -123,6 +125,35 @@ const Template = () => {
         margin: '15px 15px 0px 15px'
     }
 
+    const addTemplateData = (data, callBack) => {
+        axiosInstance.post('/template/data/add?templateId=1811663639102410753', data)
+            .then(response => {
+                if (axiosInstance.isSuccess(response, callBack)) {
+                    console.log(response.data);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    }
+
+    const delTemplateData = (dataCellId, callBack) => {
+        axiosInstance.post('/template/data/del?dataCellId='+dataCellId, )
+            .then(response => {
+                if (axiosInstance.isSuccess(response, callBack)) {
+                    console.log(response.data);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    }
+
+
+    const setDataCell=(data)=>{
+        addTemplateData(data,getData)
+    }
+
     return (
         <>
             <Row>
@@ -134,7 +165,7 @@ const Template = () => {
             </Row>
 
             <Card style={cardStyle}>
-                <DataCell/>
+                <DataCell setDataCell={setDataCell}/>
             </Card>
             <Card title={'模版数据集'} style={cardStyle}>
                 <Table columns={dataColumns} dataSource={dataCells}/>
@@ -142,20 +173,20 @@ const Template = () => {
             <Modal>
 
             </Modal>
-            {/*<Upload {...props}>*/}
-            {/*    <Button icon={<UploadOutlined />}>Select File</Button>*/}
-            {/*</Upload>*/}
-            {/*<Button*/}
-            {/*    type="primary"*/}
-            {/*    onClick={handleUpload}*/}
-            {/*    disabled={fileList.length === 0}*/}
-            {/*    loading={uploading}*/}
-            {/*    style={{*/}
-            {/*        marginTop: 16,*/}
-            {/*    }}*/}
-            {/*>*/}
-            {/*    {uploading ? 'Uploading' : 'Start Upload'}*/}
-            {/*</Button>*/}
+            <Upload {...props}>
+                <Button icon={<UploadOutlined />}>Select File</Button>
+            </Upload>
+            <Button
+                type="primary"
+                onClick={handleUpload}
+                disabled={fileList.length === 0}
+                loading={uploading}
+                style={{
+                    marginTop: 16,
+                }}
+            >
+                {uploading ? 'Uploading' : 'Start Upload'}
+            </Button>
         </>
     );
 };

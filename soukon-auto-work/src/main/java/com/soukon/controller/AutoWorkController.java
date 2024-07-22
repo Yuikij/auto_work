@@ -78,6 +78,18 @@ public class AutoWorkController {
         return dataCellService.templateDataEdit(dataCells, templateId);
     }
 
+    //   删除数据模板
+    @PostMapping("/template/data/del")
+    public ApiResponse<Object> templateDataDel(@RequestParam("dataCellId") Long dataCellId) {
+        return dataCellService.templateDataDel(dataCellId);
+    }
+
+    //   添加数据模板
+    @PostMapping("/template/data/add")
+    public ApiResponse<Object> templateDataAdd(@RequestBody DataCell dataCell, @RequestParam("templateId") Long templateId) {
+        return dataCellService.templateDataAdd(dataCell, templateId);
+    }
+
     //    查询数据模板详情
     @PostMapping("/template/data/get")
     public ApiResponse<DataCell> templateGet(@RequestParam("templateId") String templateId) {

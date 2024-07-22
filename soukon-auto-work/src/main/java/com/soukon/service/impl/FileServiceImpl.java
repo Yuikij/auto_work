@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -25,7 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
 @Service
 @Slf4j
 public class FileServiceImpl extends ServiceImpl<FilesMapper, Files> implements FileService {
-    public static final ThreadLocal<Map<Long, InputStream>> threadLocalMap = ThreadLocal.withInitial(HashMap::new);
+    public static final ThreadLocal<Map<Long, byte[]>> threadLocalMap = ThreadLocal.withInitial(HashMap::new);
 
     //todo 支持压缩和结构化文件
     public void getMapStream(List<MultipartFile> multipartFiles, List<Files> files) {
@@ -33,7 +35,18 @@ public class FileServiceImpl extends ServiceImpl<FilesMapper, Files> implements 
             multipartFiles.forEach(multipartFile -> {
                 if (e.getName().equals(multipartFile.getOriginalFilename())) {
                     try {
-                        threadLocalMap.get().put(e.getId(), multipartFile.getInputStream());
+                        InputStream inputStream = multipartFile.getInputStream();
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        try {
+                            inputStream.transferTo(byteArrayOutputStream);
+                            // Get the content as a byte array
+                            byte[] content = byteArrayOutputStream.toByteArray();
+                            threadLocalMap.get().put(e.getId(), content);
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        }
+
+
                     } catch (IOException ex) {
                         log.error("解析文件出错", ex);
                     }
@@ -44,7 +57,7 @@ public class FileServiceImpl extends ServiceImpl<FilesMapper, Files> implements 
 
     @Override
     public List<Double> getValue(DataCell dataCell) {
-        Map<Long, InputStream> inputStreamMap = threadLocalMap.get();
+        Map<Long, byte[]> inputStreamMap = threadLocalMap.get();
         Long sourceId = dataCell.getSourceId();
         List<Double> res = new ArrayList<>();
 //        ReentrantLock lock = new ReentrantLock();
@@ -57,8 +70,13 @@ public class FileServiceImpl extends ServiceImpl<FilesMapper, Files> implements 
 //        } finally {
 //            lock.unlock();
 //        }
-        InputStream inputStream = inputStreamMap.get(sourceId);
-        EasyExcel.read(inputStream, new GetDataCellValueListener(dataCell, res)).sheet(dataCell.getSheet()).doRead();
+        byte[] content = inputStreamMap.get(sourceId);
+        // Copy the input stream to a byte array
+
+
+        // Create new input streams from the byte array
+        InputStream inputStreamCopy = new ByteArrayInputStream(content);
+        EasyExcel.read(inputStreamCopy, new GetDataCellValueListener(dataCell, res)).sheet(dataCell.getSheet()).doRead();
         return res;
     }
 

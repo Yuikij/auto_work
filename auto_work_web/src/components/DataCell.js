@@ -190,7 +190,7 @@ const DataCellForm = ({setDataCell}) => {
             resData.type = 2;
         }
 
-        editTemplateData([resData])
+        // editTemplateData([resData])
         setDataCell && setDataCell(resData);
         console.log(resData);
     }

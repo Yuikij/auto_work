@@ -61,11 +61,11 @@ public class DataCellServiceImpl extends ServiceImpl<DataCellMapper, DataCell> i
         Long sourceId = dataCell.getSourceId();
         DataCell data = getById(sourceId);
         List<Double> value = getValue(data, null);
-        if (data.getSelectIndex() != null) {
-            return Collections.singletonList(value.get(data.getSelectIndex()));
+        if (dataCell.getSelectIndex() != null) {
+            return Collections.singletonList(value.get(dataCell.getSelectIndex()));
         }
-        if (data.getStartIndex() != null && data.getEndIndex() != null) {
-            return value.subList(data.getStartIndex() - 1, data.getEndIndex());
+        if (dataCell.getStartIndex() != null && dataCell.getEndIndex() != null) {
+            return value.subList(dataCell.getStartIndex() - 1, dataCell.getEndIndex());
         }
         return value;
     }
@@ -85,6 +85,19 @@ public class DataCellServiceImpl extends ServiceImpl<DataCellMapper, DataCell> i
         List<DataCell> list = list(Wrappers.lambdaQuery(DataCell.class).eq(DataCell::getTemplateId, templateId));
         return ApiResponse.<DataCell>success("查询成功").list(list);
 
+    }
+
+    @Override
+    public ApiResponse<Object> templateDataDel(Long dataCellId) {
+        removeById(dataCellId);
+        return  ApiResponse.success("删除成功");
+    }
+
+    @Override
+    public ApiResponse<Object> templateDataAdd(DataCell dataCell, Long templateId) {
+        dataCell.setTemplateId(templateId);
+        save(dataCell);
+        return  ApiResponse.success("添加成功");
     }
 
 }

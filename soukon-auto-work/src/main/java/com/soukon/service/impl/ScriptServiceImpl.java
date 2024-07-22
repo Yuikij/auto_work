@@ -68,7 +68,7 @@ public class ScriptServiceImpl implements ScriptService {
                 }
             } else {
                 for (int j = 0; j < size.get(); j++) {
-                    tmpForExecute[j][i] = doubles.get(i);
+                    tmpForExecute[j][i] = doubles.get(j);
                 }
             }
         }
