@@ -51,11 +51,8 @@ const KVAdd = () => {
                 </Select>
                 <Input value={value} onChange={handleValueChange} style={{ width: 200, marginRight: 8 }} />
                 <Button type="primary" onClick={addKvPair} style={{  marginRight: 16 }}>
-                    Add
+                    添加参数
                 </Button>
-                <Upload >
-                    <Button icon={<UploadOutlined />}>提交文件</Button>
-                </Upload>
             </div>
             <List
                 bordered
@@ -68,7 +65,6 @@ const KVAdd = () => {
                     </List.Item>
                 )}
             />
-
         </div>
     );
 };

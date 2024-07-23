@@ -19,7 +19,7 @@ public interface TemplateService extends IService<Template> {
 
     ApiResponse<Template> templateList(int type);
 
-    ApiResponse<Template> templateEdit(int type, Template template);
+    ApiResponse<Template> templateEdit(Template template);
 
     ApiResponse<Template> templateDel(String templateId);
 }

@@ -322,13 +322,24 @@ const DataCellForm = ({setDataCell}) => {
                     </Row>
                 }
                 {dataType === 3 &&
-                    <Form.Item label={"选择其他数据单元"} name="sourceId">
-                        <Select
-                            style={{width: '20vw'}}
-                            allowClear
-                            options={dataSelectValue}
-                        />
-                    </Form.Item>
+                    <Row>
+                        <Col span={8}>
+                            <Form.Item label={"选择其他数据单元"} name="sourceId">
+                                <Select
+                                    style={{width: '20vw'}}
+                                    allowClear
+                                    options={dataSelectValue}
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col span={8}>
+                            <Form.Item label={"选择其他数据单元索引"} name="selectIndex">
+                                <InputNumber style={{width: "20vw"}}/>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
+
                 }
                 {dataType === 4 &&
                     <Form.Item label={"选择参数"} name="paramName">
@@ -341,7 +352,7 @@ const DataCellForm = ({setDataCell}) => {
                     </Form.Item>
                 }
                 <Form.Item label={"是否是最终结果"} name="res">
-                    <Switch defaultChecked/>
+                    <Switch defaultChecked defaultValue={true}/>
                 </Form.Item>
                 {/*</Form>*/}
             </Modal>
@@ -359,6 +370,7 @@ const DataCellForm = ({setDataCell}) => {
             }} menu={{items: operationEnum, onClick: handleMenuClick}} placement="bottomLeft">
                 <Button icon={<PlusCircleOutlined/>}/>
             </Dropdown>
+            {/*<Input/>*/}
             <Button onClick={saveData} style={{marginLeft: "10px"}}>添加数据集</Button>
         </div>
 

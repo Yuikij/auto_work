@@ -54,7 +54,7 @@ const Home = () => {
             <Header style={headerStyle}>AUTO WORK</Header>
             <Layout>
                 <Sider width="30%" style={siderStyle}>
-                    <TemplateList/>
+                    <TemplateList type={2}/>
                     <FileList/>
                 </Sider>
                 <Content style={contentStyle}>

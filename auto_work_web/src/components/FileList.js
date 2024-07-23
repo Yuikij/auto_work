@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Button, Card, Col, Divider, Dropdown, Input, List, message, Row, Tree} from 'antd';
 import axiosInstance from "../utils/request";
 import EditList from "./EditList";
+import TemplateList from "./TemplateList";
 
 const FileList = () => {
     const [data, setData] = useState([]);
@@ -59,7 +60,8 @@ const FileList = () => {
     }
 
     const editFilePost = (item, callBack) => {
-        axiosInstance.post('/template/edit?type=1', {...item})
+        item.type = 1;
+        axiosInstance.post('/template/edit', {...item})
             .then(response => {
                 console.log(response);
                 console.log(axiosInstance.isSuccess(response));
@@ -120,7 +122,7 @@ const FileList = () => {
     return (
         <div>
             <Card title={"文件列表"}>
-                <EditList dataList={data} onEdit={handleBlur} onDelete={delFile} onAdd={handleAddBlur}/>
+                <TemplateList type={1}/>
                 <Divider>文件列表详情</Divider>
                 <EditList dataList={detailData} onEdit={onDetailEdit} onDelete={delFile} onAdd={handleAddBlur}/>
             </Card>

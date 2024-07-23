@@ -79,7 +79,7 @@ public class TemplateServiceImpl extends ServiceImpl<TemplateMapper, Template> i
     }
 
     @Override
-    public ApiResponse<Template> templateEdit(int type, Template template) {
+    public ApiResponse<Template> templateEdit(Template template) {
         UserBO user = tokenService.getUser();
         template.setUserId(user.getUserid());
         updateById(template);

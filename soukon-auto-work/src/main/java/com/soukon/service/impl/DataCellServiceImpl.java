@@ -62,7 +62,7 @@ public class DataCellServiceImpl extends ServiceImpl<DataCellMapper, DataCell> i
         DataCell data = getById(sourceId);
         List<Double> value = getValue(data, null);
         if (dataCell.getSelectIndex() != null) {
-            return Collections.singletonList(value.get(dataCell.getSelectIndex()));
+            return Collections.singletonList(value.get(dataCell.getSelectIndex()-1));
         }
         if (dataCell.getStartIndex() != null && dataCell.getEndIndex() != null) {
             return value.subList(dataCell.getStartIndex() - 1, dataCell.getEndIndex());

@@ -6,6 +6,7 @@ import {dataTypeMap} from "../enums/DataEnums";
 import DataCell from "./DataCell";
 import EditList from "./EditList";
 import KVAdd from "./KVAdd";
+import TemplateList from "./TemplateList";
 
 const Template = () => {
     const [fileList, setFileList] = useState([]);
@@ -109,8 +110,8 @@ const Template = () => {
             render: (_, record) => (
                 <Space size="middle">
                     <a>编辑</a>
-                    <a onClick={()=>{
-                        delTemplateData(record.id,getData)
+                    <a onClick={() => {
+                        delTemplateData(record.id, getData)
                     }}>删除</a>
                 </Space>
             ),
@@ -138,7 +139,7 @@ const Template = () => {
     }
 
     const delTemplateData = (dataCellId, callBack) => {
-        axiosInstance.post('/template/data/del?dataCellId='+dataCellId, )
+        axiosInstance.post('/template/data/del?dataCellId=' + dataCellId,)
             .then(response => {
                 if (axiosInstance.isSuccess(response, callBack)) {
                     console.log(response.data);
@@ -150,18 +151,38 @@ const Template = () => {
     }
 
 
-    const setDataCell=(data)=>{
-        addTemplateData(data,getData)
+    const setDataCell = (data) => {
+        addTemplateData(data, getData)
     }
 
     return (
         <>
             <Row>
-                <Col span={12}>
+                <Col span={10}>
                     <Card style={cardStyleCol} title={"参数定义"}>
+                        <TemplateList type={3}/>
                     </Card>
                 </Col>
-                <Col span={12}><KVAdd/></Col>
+                <Col span={10}><KVAdd/></Col>
+                <Col span={4}>
+                    <Card style={cardStyleCol} title={"结果计算"}>
+                        <Upload {...props}>
+                            <Button icon={<UploadOutlined/>}>上传文件</Button>
+                        </Upload>
+                        <Button
+                            type="primary"
+                            onClick={handleUpload}
+                            disabled={fileList.length === 0}
+                            loading={uploading}
+                            style={{
+                                marginTop: 16,
+                            }}
+                        >
+                            {uploading ? 'Uploading' : '开始运行'}
+                        </Button>
+                    </Card>
+
+                </Col>
             </Row>
 
             <Card style={cardStyle}>
@@ -173,20 +194,7 @@ const Template = () => {
             <Modal>
 
             </Modal>
-            <Upload {...props}>
-                <Button icon={<UploadOutlined />}>Select File</Button>
-            </Upload>
-            <Button
-                type="primary"
-                onClick={handleUpload}
-                disabled={fileList.length === 0}
-                loading={uploading}
-                style={{
-                    marginTop: 16,
-                }}
-            >
-                {uploading ? 'Uploading' : 'Start Upload'}
-            </Button>
+
         </>
     );
 };

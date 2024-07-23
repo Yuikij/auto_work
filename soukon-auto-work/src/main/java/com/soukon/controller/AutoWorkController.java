@@ -26,8 +26,7 @@ public class AutoWorkController {
     private TemplateService templateService;
     @Autowired
     private FileService fileService;
-    @Autowired
-    private DataCellService dataCellService;
+
 
     //    创建文件模板
     @PostMapping("/template/files/add")
@@ -56,8 +55,8 @@ public class AutoWorkController {
 
     //    查询模板列表
     @PostMapping("/template/edit")
-    public ApiResponse<Template> templateEdit(@RequestParam("type") int type,@RequestBody Template template) {
-        return templateService.templateEdit(type,template);
+    public ApiResponse<Template> templateEdit(@RequestBody Template template) {
+        return templateService.templateEdit(template);
     }
 
     @PostMapping("/template/del")
@@ -68,32 +67,7 @@ public class AutoWorkController {
     //    创建数据模板
     @PostMapping("/template/add")
     public ApiResponse<Object> templateAdd(@RequestBody Template template) {
-        template.setType(2);
         return templateService.templateAdd(template);
-    }
-
-    //    编辑数据模板
-    @PostMapping("/template/data/edit")
-    public ApiResponse<Object> templateDataEdit(@RequestBody List<DataCell> dataCells, @RequestParam("templateId") String templateId) {
-        return dataCellService.templateDataEdit(dataCells, templateId);
-    }
-
-    //   删除数据模板
-    @PostMapping("/template/data/del")
-    public ApiResponse<Object> templateDataDel(@RequestParam("dataCellId") Long dataCellId) {
-        return dataCellService.templateDataDel(dataCellId);
-    }
-
-    //   添加数据模板
-    @PostMapping("/template/data/add")
-    public ApiResponse<Object> templateDataAdd(@RequestBody DataCell dataCell, @RequestParam("templateId") Long templateId) {
-        return dataCellService.templateDataAdd(dataCell, templateId);
-    }
-
-    //    查询数据模板详情
-    @PostMapping("/template/data/get")
-    public ApiResponse<DataCell> templateGet(@RequestParam("templateId") String templateId) {
-        return dataCellService.templateGet(templateId);
     }
 
     //    执行模板
