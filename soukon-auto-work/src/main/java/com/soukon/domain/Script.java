@@ -10,7 +10,7 @@ import java.util.List;
 @Slf4j
 public class Script {
     private int scriptType;
-    private String operationScript;
+    private List<String> operationScript;
     private List<DataCell> dataCells;
 
 }

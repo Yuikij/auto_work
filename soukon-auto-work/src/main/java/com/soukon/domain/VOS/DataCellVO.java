@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 
 public class DataCellVO {
-    private long id;
+    private Long id;
     private String name;
     private List<Double> value;
 

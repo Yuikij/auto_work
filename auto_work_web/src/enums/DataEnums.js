@@ -40,3 +40,9 @@ export const ScriptTypesLabel = {
     3: "运算"
 }
 
+export const LabelType = {
+    SIGN: 1,
+    SCRIPT: 2,
+    DATA: 3
+}
+

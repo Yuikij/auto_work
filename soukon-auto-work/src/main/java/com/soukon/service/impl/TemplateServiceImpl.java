@@ -70,10 +70,11 @@ public class TemplateServiceImpl extends ServiceImpl<TemplateMapper, Template> i
 
 
     @Override
-    public ApiResponse<Template> templateList(int type) {
+    public ApiResponse<Template> templateList(int type, Long dataTemplateId) {
         UserBO user = tokenService.getUser();
         LambdaQueryWrapper<Template> wrapper = Wrappers.lambdaQuery(Template.class);
-        wrapper.eq(Template::getType, type).eq(Template::getUserId, user.getUserid());
+        wrapper.eq(Template::getType, type).eq(Template::getUserId, user.getUserid())
+                .eq(dataTemplateId!=null,Template::getDataTemplateId,dataTemplateId);
         List<Template> list = list(wrapper);
         return ApiResponse.<Template>success().list(list);
     }

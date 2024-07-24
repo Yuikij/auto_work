@@ -4,23 +4,26 @@ import {UploadOutlined} from "@ant-design/icons";
 
 const { Option } = Select;
 
-const keyOptions = ['name', 'age', 'email', 'address'];
 
-const KVAdd = () => {
+const KVAdd = ({keyOptions,onChange}) => {
     const [kvPairs, setKvPairs] = useState([]);
     const [selectedKey, setSelectedKey] = useState(keyOptions[0]);
     const [value, setValue] = useState('');
 
     const addKvPair = () => {
         if (!kvPairs.some(pair => pair.key === selectedKey)) {
-            setKvPairs([...kvPairs, { key: selectedKey, value }]);
+            const newVar = [...kvPairs, { key: selectedKey, value }];
+            onChange(newVar)
+            setKvPairs(newVar);
             setSelectedKey(keyOptions[0]);
             setValue('');
         }
     };
 
     const deleteKvPair = (key) => {
-        setKvPairs(kvPairs.filter(pair => pair.key !== key));
+        const filter = kvPairs.filter(pair => pair.key !== key);
+        setKvPairs(filter);
+        onChange(filter);
     };
 
     const handleKeyChange = (key) => {
@@ -59,7 +62,7 @@ const KVAdd = () => {
                 dataSource={kvPairs}
                 renderItem={(item) => (
                     <List.Item
-                        actions={[<Button type="link" onClick={() => deleteKvPair(item.key)}>Delete</Button>]}
+                        actions={[<Button type="link" onClick={() => deleteKvPair(item.key)}>删除</Button>]}
                     >
                         {item.key}: {item.value}
                     </List.Item>

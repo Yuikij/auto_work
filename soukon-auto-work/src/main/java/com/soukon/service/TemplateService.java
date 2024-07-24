@@ -17,7 +17,7 @@ public interface TemplateService extends IService<Template> {
     ApiResponse<Object> templateAdd(Template template);
 
 
-    ApiResponse<Template> templateList(int type);
+    ApiResponse<Template> templateList(int type, Long dataTemplateId);
 
     ApiResponse<Template> templateEdit(Template template);
 

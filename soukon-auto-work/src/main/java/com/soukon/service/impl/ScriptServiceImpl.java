@@ -18,6 +18,7 @@ import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -44,7 +45,7 @@ public class ScriptServiceImpl implements ScriptService {
     public List<Double> executeOperation(Script script) {
         ScriptEngineManager manager = new ScriptEngineManager();
         List<DataCell> dataCells = script.getDataCells();
-        String operationScript = script.getOperationScript();
+        String operationScript = String.join("", script.getOperationScript());
         ScriptEngine engine = manager.getEngineByName("groovy");
         List<Double> res = new ArrayList<>();
         List<List<Double>> tmp = new ArrayList<>();
@@ -103,7 +104,7 @@ public class ScriptServiceImpl implements ScriptService {
     }
 
     public List<Double> executeFunction(Script script) {
-        String operationScript = script.getOperationScript();
+        String operationScript = String.join("", script.getOperationScript());
         List<Double> numbers = executeGroup(script);
         Double res = 0.0;
         if ("+".equals(operationScript)) {

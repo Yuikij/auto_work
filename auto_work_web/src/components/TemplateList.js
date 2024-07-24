@@ -3,7 +3,7 @@ import axiosInstance from "../utils/request";
 import EditList from "./EditList";
 import {Card} from "antd";
 
-const TemplateList = ({type}) => {
+const TemplateList = ({type,onChange,dataTemplateId}) => {
     const [data, setData] = useState([]);
 
     useEffect(() => {
@@ -11,13 +11,16 @@ const TemplateList = ({type}) => {
     }, []); // 空数组作为依赖项，确保只在组件挂载时运行一次
 
     const getFilePost = () => {
-        axiosInstance.post('/template/list?type=' + type)
+        const params = {type};
+        dataTemplateId&&(params.dataTemplateId=dataTemplateId)
+        axiosInstance.post('/template/list',null,{params})
             .then(response => {
                 console.log(response);
                 console.log(axiosInstance.isSuccess(response));
                 if (axiosInstance.isSuccess(response)) {
                     const {list} = response.data;
                     setData(list)
+                    onChange&&onChange(list)
                 }
             })
             .catch(error => {
@@ -68,7 +71,9 @@ const TemplateList = ({type}) => {
 
     const handleAddBlur = (e) => {
         const name = e.target.value;
-        axiosInstance.post('/template/add', {name, type: type})
+        const template = {name, type: type};
+        dataTemplateId&&(template.dataTemplateId=dataTemplateId)
+        axiosInstance.post('/template/add', template)
             .then(response => {
                 console.log(response);
                 console.log(axiosInstance.isSuccess(response));
