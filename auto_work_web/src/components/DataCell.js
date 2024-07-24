@@ -26,7 +26,7 @@ const DataCellForm = ({setDataCell, initDataCell}) => {
         const [dataCells, setDataCells] = useState([]);
         const [operations, setOperations] = useState([]);
         const [dataLabels, setDataLabels] = useState([]);
-        const [dataCellName, setDataCellName] = useState([]);
+        const [dataCellName, setDataCellName] = useState("");
 
         const [groupDataCells, setGroupDataCells] = useState([]);
         const [operationScript, setOperationScript] = useState([]);
@@ -39,6 +39,7 @@ const DataCellForm = ({setDataCell, initDataCell}) => {
 
         const [fileSelectValue, setFileSelectValue] = useState([]);
         const [dataSelectValue, setDataSelectValue] = useState([]);
+        const [paramsSelectValue, setParamsSelectValue] = useState([]);
         const [isAdded, setIsAdded] = useState(false);
         const [isShow, setIsShow] = useState(false);
 
@@ -94,6 +95,9 @@ const DataCellForm = ({setDataCell, initDataCell}) => {
         const onLabelClick = (dataLabel, e) => {
             if (dataLabel.type === LabelType.DATA) {
                 const dataCell = dataCells[dataLabel.index]
+                if (dataCell.specificValue) {
+                    dataCell.specificValue = dataCell.specificValue.join(",")
+                }
                 setIsShow(true)
                 setDataType(dataCell.type)
                 form.setFieldsValue(dataCell);
@@ -124,6 +128,23 @@ const DataCellForm = ({setDataCell, initDataCell}) => {
             }
         }
 
+        const getParamsSelect = (callBack) => {
+            const params = {type:3};
+            params.dataTemplateId="1811663706395824129";
+            axiosInstance.post('/template/list',null,{params})
+                .then(response => {
+                    console.log(response);
+                    console.log(axiosInstance.isSuccess(response));
+                    if (axiosInstance.isSuccess(response)) {
+                        const {list} = response.data;
+                        setParamsSelectValue(list.map(e => ({label: e.name, value: e.name})))
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
         const getFileSelect = (callBack) => {
             axiosInstance.post('/files/get?fileTemplateId=1811663639102410753')
                 .then(response => {
@@ -151,19 +172,8 @@ const DataCellForm = ({setDataCell, initDataCell}) => {
                 });
         }
 
-        const editTemplateData = (data, callBack) => {
-            axiosInstance.post('/template/data/edit?templateId=1811663639102410753', data)
-                .then(response => {
-                    if (axiosInstance.isSuccess(response, callBack)) {
-                        console.log(response.data);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
-        }
-
         const initDataSelect = () => {
+            getParamsSelect()
             getDataSelect(getFileSelect.bind(this, () => {
                 setShowData(true)
             }))
@@ -244,7 +254,7 @@ const DataCellForm = ({setDataCell, initDataCell}) => {
             ")": addOperations,
             "group": addGroups,
             "sum": addFunctions.bind(this, "+"),
-            "multi": addFunctions.bind("-"),
+            "multi": addFunctions.bind(this, "*"),
             "data": addDataCells,
         }
 
@@ -264,6 +274,7 @@ const DataCellForm = ({setDataCell, initDataCell}) => {
             let resData;
             if (dataCells.length === 1) {
                 resData = dataCells[0];
+                resData.name = dataCellName;
             } else {
                 resData = createScriptDataCell(dataCells, dataCellName, operations, ScriptTypes.OPERATION)
                 resData.res = 1;
@@ -276,6 +287,11 @@ const DataCellForm = ({setDataCell, initDataCell}) => {
         }
         const onDataCreate = (values) => {
             console.log('Received values of form: ', values);
+
+            if (values && values.specificValue) {
+                values.specificValue = values.specificValue.split(",");
+            }
+
             const size = dataCells.length;
             const label = {
                 value: values.name,
@@ -304,7 +320,7 @@ const DataCellForm = ({setDataCell, initDataCell}) => {
                             const newData = [...groupDataCells];
                             newData[newData.length - 1] = data;
                             setGroupDataCells(newData)
-                        }} />)
+                        }}/>)
                     }
                     <Button type="primary" disabled={isShow}
                             onClick={addGroupDataCells}>{"添加" + ScriptTypesLabel[editingType] + "的数据单元"}</Button>
@@ -430,7 +446,11 @@ const DataCellForm = ({setDataCell, initDataCell}) => {
                     }
                     {dataType === 4 &&
                         <Form.Item label={"选择参数"} name="paramName">
-                            <Input onChange={e => setGroupName(e.target.value)} style={{width: "20vw"}}/>
+                            <Select
+                                style={{width: '20vw'}}
+                                allowClear
+                                options={paramsSelectValue}
+                            />
                         </Form.Item>
                     }
                     {dataType === 5 &&

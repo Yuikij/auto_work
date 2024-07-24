@@ -10,10 +10,18 @@ import com.soukon.domain.DataCell;
 import com.soukon.mapper.DataCellMapper;
 import com.soukon.service.DataCellService;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -65,10 +73,43 @@ public class ApplicationTests {
     }
 
     @Test
-    public void testExcel() {
-        String fileName = "E:\\\\文档\\WeChat Files\\wxid_gcqt9cwcpxad21\\FileStorage\\File\\2024-06\\重大慢病过早死亡概率+心脑血管标化死亡率+70以下慢性呼吸死亡率\\重大慢病过早死亡概率+心脑血管标化死亡率+70以下慢性呼吸死亡率\\1、原始数据\\常住人口（分母）\\常住人口年龄别数据（20XX ）.xls";
+    public void testExcel() throws IOException {
+//        "E:\文档\WeChat Files\wxid_gcqt9cwcpxad21\FileStorage\File\2024-06\重大慢病过早死亡概率+心脑血管标化死亡率+70以下慢性呼吸死亡率\重大慢病过早死亡概率+心脑血管标化死亡率+70以下慢性呼吸死亡率\1、原始数据\死亡人数（分子）\廊坊市20XX年  居民病伤死亡原因报表（年龄）.xls"
+        String s = "E:\\\\文档\\WeChat Files\\wxid_gcqt9cwcpxad21\\FileStorage\\File\\2024-06\\重大慢病过早死亡概率+心脑血管标化死亡率+70以下慢性呼吸死亡率\\重大慢病过早死亡概率+心脑血管标化死亡率+70以下慢性呼吸死亡率\\1、原始数据\\死亡人数（分子）\\廊坊市20XX年  居民病伤死亡原因报表（年龄）.xls";
+        String fileName = s;
+//        String fileName = "E:\\\\文档\\WeChat Files\\wxid_gcqt9cwcpxad21\\FileStorage\\File\\2024-06\\重大慢病过早死亡概率+心脑血管标化死亡率+70以下慢性呼吸死亡率\\重大慢病过早死亡概率+心脑血管标化死亡率+70以下慢性呼吸死亡率\\1、原始数据\\常住人口（分母）\\常住人口年龄别数据（20XX ）.xls";
         // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
-        EasyExcel.read(fileName, new NoModelDataListener()).sheet().doRead();
+        EasyExcel.read(fileName, new NoModelDataListener()).sheet("Sheet1").doRead();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            String firstLine = reader.readLine().trim().toLowerCase();
+            System.out.println(firstLine);
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+
+
+        // Parse HTML file
+        Document doc = Jsoup.parse(new File(fileName), "UTF-8");
+
+        // Create a new Workbook
+
+
+        // Get all rows from the HTML table
+        Elements rows = doc.select("table tr");
+
+        for (int i = 0; i < rows.size(); i++) {
+            Element row = rows.get(i);
+            Elements cells = row.select("td, th");
+
+
+            for (int j = 0; j < cells.size(); j++) {
+                Element cell = cells.get(j);
+                System.out.println(cell.text());
+            }
+        }
+
     }
 
     @Test

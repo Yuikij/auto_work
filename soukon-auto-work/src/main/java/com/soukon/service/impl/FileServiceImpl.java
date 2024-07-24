@@ -9,7 +9,9 @@ import com.soukon.domain.Files;
 import com.soukon.listener.GetDataCellValueListener;
 import com.soukon.mapper.FilesMapper;
 import com.soukon.service.FileService;
+import com.soukon.utils.HtmlParser;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.poifs.filesystem.FileMagic;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -60,24 +62,36 @@ public class FileServiceImpl extends ServiceImpl<FilesMapper, Files> implements 
         Map<Long, byte[]> inputStreamMap = threadLocalMap.get();
         Long sourceId = dataCell.getSourceId();
         List<Double> res = new ArrayList<>();
-//        ReentrantLock lock = new ReentrantLock();
-//        Condition condition = lock.newCondition();
-//        try {
-//            lock.lock();
-//            condition.await();
-//        } catch (InterruptedException e) {
-//            log.error("等待解析文件出错", e);
-//        } finally {
-//            lock.unlock();
-//        }
         byte[] content = inputStreamMap.get(sourceId);
-        // Copy the input stream to a byte array
-
-
+        // 获取文件头的前8个字节
+        byte[] header = new byte[8];
+        System.arraycopy(content, 0, header, 0, 8);
+        String fileSignature = bytesToHex(header);
+        log.info("fileSignature:{}",FileMagic.valueOf(header));
+//        System.out.println(FileMagic.valueOf(header));
         // Create new input streams from the byte array
         InputStream inputStreamCopy = new ByteArrayInputStream(content);
-        EasyExcel.read(inputStreamCopy, new GetDataCellValueListener(dataCell, res)).sheet(dataCell.getSheet()).doRead();
-        return res;
+
+        if (FileMagic.UNKNOWN.equals(FileMagic.valueOf(header))){
+            HtmlParser htmlParser = new HtmlParser(dataCell, res);
+            try {
+                htmlParser.parseHtml(inputStreamCopy);
+            } catch (IOException e) {
+               log.error("解析文件失败");
+            }
+        }else {
+            EasyExcel.read(inputStreamCopy, new GetDataCellValueListener(dataCell, res)).sheet(dataCell.getSheet()).doRead();
+
+        }
+          return res;
+    }
+
+    private static String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02X", b));
+        }
+        return sb.toString();
     }
 
     @Override

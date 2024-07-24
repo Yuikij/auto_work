@@ -55,6 +55,7 @@ public class TemplateServiceImpl extends ServiceImpl<TemplateMapper, Template> i
     @Override
     public ApiResponse<DataCellVO> templateExecute(List<MultipartFile> files, String templateId, String params) {
         JSONObject jsonObject = JSONObject.parseObject(params);
+        DataCellServiceImpl.params.set(jsonObject);
         List<Files> list = fileService.list(Wrappers.lambdaQuery(Files.class).eq(Files::getTemplateId, templateId));
         fileService.getMapStream(files, list);
         return execute(Long.parseLong(templateId), jsonObject);

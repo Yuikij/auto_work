@@ -14,7 +14,7 @@ const Template = () => {
     const [uploading, setUploading] = useState(false);
     const [dataCells, setDataCells] = useState(false);
     const [paramsSelect, setParamsSelect] = useState([]);
-    const [params, setParams] = useState([]);
+    const [params, setParams] = useState({});
     const [dataValueOpen, setDataValueOpen] = useState(false);
     const [dataValue, setDataValue] = useState([]);
 
@@ -68,7 +68,7 @@ const Template = () => {
             formData.append('files', file);
         });
         formData.append('templateId', "1811663639102410753");
-        formData.append('params', "{}");
+        formData.append('params', JSON.stringify(params));
         setUploading(true);
         axiosInstance.post('/template/execute', formData, {
             headers: {
@@ -230,7 +230,7 @@ const Template = () => {
             </Row>
 
             <Card style={cardStyle}>
-                <DataCell setDataCell={setDataCell} initDataCell={dataCells[3]}/>
+                <DataCell setDataCell={setDataCell} />
             </Card>
             <Card title={'模版数据集'} style={cardStyle}>
                 <Table columns={dataColumns} dataSource={dataCells}/>

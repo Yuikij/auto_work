@@ -16,8 +16,8 @@ const request = () => {
 }
 
 const axiosInstance = axios.create({
-    baseURL: process.env.NODE_ENV === 'development' ?'':'auto_work',
-    timeout: 1000,
+    // baseURL: process.env.NODE_ENV === 'development' ?'':'auto_work',
+    timeout: 10000,
     // headers: {'Content-Type': 'application/json'},
 });
 axiosInstance.interceptors.request.use(

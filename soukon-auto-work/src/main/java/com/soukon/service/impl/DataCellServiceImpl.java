@@ -32,9 +32,10 @@ public class DataCellServiceImpl extends ServiceImpl<DataCellMapper, DataCell> i
     private FileService fileService;
 
     public static final ThreadLocal<Map<DataCell, List<Double>>> threadLocalMap = ThreadLocal.withInitial(HashMap::new);
+    public static final ThreadLocal<JSONObject> params = ThreadLocal.withInitial(JSONObject::new);
 
     @Override
-    public List<Double> getValue(DataCell dataCell, JSONObject params) {
+    public List<Double> getValue(DataCell dataCell, JSONObject params_) {
         List<Double> doubles = threadLocalMap.get().get(dataCell);
         if (doubles!=null){
             return doubles;
@@ -48,9 +49,9 @@ public class DataCellServiceImpl extends ServiceImpl<DataCellMapper, DataCell> i
         } else if (DataCellEnum.DATA.getValue() == type) {
             return getDataValue(dataCell);
         } else if (DataCellEnum.PARAM.getValue() == type) {
-            return List.of(params.getDouble(dataCell.getParamName()));
+            return List.of(params.get().getDouble(dataCell.getParamName()));
         } else if (DataCellEnum.VAL.getValue() == type) {
-            return List.of(dataCell.getSpecificValue());
+            return dataCell.getSpecificValue();
         }
         return List.of();
     }
