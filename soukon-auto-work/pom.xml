@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.soukon</groupId>
-        <artifactId>soukon_common</artifactId>
+        <artifactId>soukon_auto</artifactId>
         <version>1.0</version>
     </parent>
 

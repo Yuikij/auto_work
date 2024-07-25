@@ -7,7 +7,7 @@
     <packaging>pom</packaging>
     <version>1.0</version>
     <groupId>com.soukon</groupId>
-    <artifactId>soukon_common</artifactId>
+    <artifactId>soukon_auto</artifactId>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -16,6 +16,7 @@
     </parent>
     <modules>
         <module>soukon-auto-work</module>
+        <module>common_webapp_template</module>
     </modules>
 
     <properties>
