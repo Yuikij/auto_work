@@ -1,4 +1,4 @@
-import {Button, Card, Col, Divider, Drawer, List, message, Modal, Row, Space, Table, Tag, Upload} from "antd";
+import {Button, Card, Col, Divider, Drawer, List, message, Modal, Row, Space, Switch, Table, Tag, Upload} from "antd";
 import {UploadOutlined} from "@ant-design/icons";
 import React, {useEffect, useState} from "react";
 import axiosInstance from "../utils/request";
@@ -23,6 +23,21 @@ const Template = () => {
         getParamsSelect();
     }, []); // 空数组作为依赖项，确保只在组件挂载时运行一次
 
+    const editDataValue = (data) => {
+        axiosInstance.post('/data/edit', data)
+            .then(response => {
+                console.log(response);
+                console.log(axiosInstance.isSuccess(response));
+                if (axiosInstance.isSuccess(response)) {
+                    getData();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    }
+
+
     const getParamsSelect = () => {
         axiosInstance.post('/template/list?type=3')
             .then(response => {
@@ -30,8 +45,8 @@ const Template = () => {
                 console.log(axiosInstance.isSuccess(response));
                 if (axiosInstance.isSuccess(response)) {
                     const {list} = response.data;
-                    const map = list.map(e=>(e.name));
-                    setParamsSelect( map)
+                    const map = list.map(e => (e.name));
+                    setParamsSelect(map)
                 }
             })
             .catch(error => {
@@ -43,19 +58,24 @@ const Template = () => {
     }
 
     const onParamsChange = (value) => {
-        const newParams={}
-        value.forEach(e=>{
-            newParams[e.key]=e.value
+        const newParams = {}
+        value.forEach(e => {
+            newParams[e.key] = e.value
         });
         setParams(newParams)
-        console.log(newParams,"newParams");
+        console.log(newParams, "newParams");
     }
     const getData = () => {
         axiosInstance.post('/data/get?templateId=1811663639102410753')
             .then(response => {
                 if (axiosInstance.isSuccess(response)) {
                     console.log(response, "getData");
-                    setDataCells(response.data.list);
+                    const list = response.data.list;
+                    list.sort((a, b) => {
+                        if (a.res === b.res) return 0;
+                        return a.res ? -1 : 1;
+                    });
+                    setDataCells(list);
                 }
             })
             .catch(error => {
@@ -78,8 +98,8 @@ const Template = () => {
             .then(response => {
                 if (axiosInstance.isSuccess(response)) {
                     const list = response.data.list;
-                    console.log(list,"handleUpload");
-                    const newList = mergeArrays(dataCells,list);
+                    console.log(list, "handleUpload");
+                    const newList = mergeArrays(dataCells, list);
                     console.log(newList);
                     setFileList([]);
                     setDataCells(newList);
@@ -87,7 +107,7 @@ const Template = () => {
                 }
             })
             .catch((e) => {
-                message.error(e,'执行失败');
+                message.error(e, '执行失败');
             })
             .finally(() => {
                 setUploading(false);
@@ -126,14 +146,18 @@ const Template = () => {
             title: '是否执行',
             dataIndex: 'res',
             key: 'res',
-            render: (res) => res ? '是' : '否',
+            // render: (res) => res ? '是' : '否',
+            render: (res, record) => <Switch value={res} onChange={() => {
+                record.res = !record.res;
+                editDataValue(record);
+            }}/>,
         },
         {
             title: '最终结果',
             dataIndex: 'value',
             key: 'value',
-            render: (res) => !res?"":(res.length===1 ? res :
-                <Button onClick={()=>{
+            render: (res) => !res ? "" : (res.length === 1 ? res :
+                <Button onClick={() => {
                     setDataValue(res)
                     setDataValueOpen(true)
                 }}>查看</Button>),
@@ -230,7 +254,7 @@ const Template = () => {
             </Row>
 
             <Card style={cardStyle}>
-                <DataCell setDataCell={setDataCell} />
+                <DataCell setDataCell={setDataCell}/>
             </Card>
             <Card title={'模版数据集'} style={cardStyle}>
                 <Table columns={dataColumns} dataSource={dataCells}/>

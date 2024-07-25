@@ -17,9 +17,16 @@ public class DataCellController {
     private DataCellService dataCellService;
 
     //    编辑数据模板
-    @PostMapping("/data/edit")
+    @PostMapping("/template/data/edit")
     public ApiResponse<Object> templateDataEdit(@RequestBody List<DataCell> dataCells, @RequestParam("templateId") String templateId) {
         return dataCellService.templateDataEdit(dataCells, templateId);
+    }
+
+
+    //    编辑数据模板
+    @PostMapping("/data/edit")
+    public ApiResponse<Object> dataEdit(@RequestBody DataCell dataCell) {
+        return dataCellService.dataEdit(dataCell);
     }
 
     //   删除数据模板

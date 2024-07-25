@@ -16,4 +16,6 @@ public interface DataCellService extends IService<DataCell> {
     ApiResponse<Object> templateDataDel(Long dataCellId);
 
     ApiResponse<Object> templateDataAdd(DataCell dataCell, Long templateId);
+
+    ApiResponse<Object> dataEdit(DataCell dataCell);
 }

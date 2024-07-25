@@ -35,7 +35,7 @@ public class DataCell {
     //    是否是最终结果
     private boolean res;
     //    所属的模板id
-    private long templateId;
+    private Long templateId;
     //具体数值
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<Double> specificValue;

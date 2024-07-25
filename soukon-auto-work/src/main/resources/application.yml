@@ -19,3 +19,6 @@ spring:
         username: nacos
         password: nacos
         namespace: 7cb64de9-1ec0-4ab2-a619-e30f60225978
+logging:
+  level:
+    com.soukon.mapper: debug
