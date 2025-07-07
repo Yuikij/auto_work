@@ -55,39 +55,4 @@ public class OfflineApplication {
             }
         }
     }
-
-    @Component
-    @Profile("offline")
-    static class BrowserOpener implements ApplicationRunner {
-        
-        private final Environment environment;
-        
-        public BrowserOpener(Environment environment) {
-            this.environment = environment;
-        }
-        
-        @Override
-        public void run(ApplicationArguments args) throws Exception {
-            String port = environment.getProperty("server.port", "9915");
-            String url = "http://localhost:" + port;
-            
-            log.info("应用启动完成，访问地址: {}", url);
-            
-            // 延迟2秒后打开浏览器，确保应用完全启动
-            new Thread(() -> {
-                try {
-                    Thread.sleep(2000);
-                    if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                        Desktop.getDesktop().browse(new URI(url));
-                        log.info("已自动打开浏览器");
-                    } else {
-                        log.info("系统不支持自动打开浏览器，请手动访问: {}", url);
-                    }
-                } catch (Exception e) {
-                    log.warn("无法自动打开浏览器: {}", e.getMessage());
-                    log.info("请手动访问: {}", url);
-                }
-            }).start();
-        }
-    }
 }

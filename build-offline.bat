@@ -72,7 +72,7 @@ echo ==========================================
 cd soukon-auto-work
 
 echo 正在构建后端项目...
-call mvn clean package -DskipTests -Poffline
+call mvn clean package -DskipTests
 if errorlevel 1 (
     echo 后端构建失败！
     cd ..

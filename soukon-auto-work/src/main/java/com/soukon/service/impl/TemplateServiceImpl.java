@@ -4,8 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.soukon.auth.domain.UserBO;
-import com.soukon.auth.service.TokenService;
 import com.soukon.core.http.ApiResponse;
 import com.soukon.domain.DataCell;
 import com.soukon.domain.Files;
@@ -27,9 +25,6 @@ import java.util.List;
 public class TemplateServiceImpl extends ServiceImpl<TemplateMapper, Template> implements TemplateService {
     @Autowired
     private DataCellService dataCellService;
-
-    @Autowired
-    private TokenService tokenService;
 
     @Autowired
     private FileService fileService;
@@ -63,8 +58,6 @@ public class TemplateServiceImpl extends ServiceImpl<TemplateMapper, Template> i
 
     @Override
     public ApiResponse<Object> templateAdd(Template template) {
-        UserBO user = tokenService.getUser();
-        template.setUserId(user.getUserid());
         save(template);
         return ApiResponse.success("保存成功");
     }
@@ -72,9 +65,8 @@ public class TemplateServiceImpl extends ServiceImpl<TemplateMapper, Template> i
 
     @Override
     public ApiResponse<Template> templateList(int type, Long dataTemplateId) {
-        UserBO user = tokenService.getUser();
         LambdaQueryWrapper<Template> wrapper = Wrappers.lambdaQuery(Template.class);
-        wrapper.eq(Template::getType, type).eq(Template::getUserId, user.getUserid())
+        wrapper.eq(Template::getType, type)
                 .eq(dataTemplateId!=null,Template::getDataTemplateId,dataTemplateId);
         List<Template> list = list(wrapper);
         return ApiResponse.<Template>success().list(list);
@@ -82,8 +74,6 @@ public class TemplateServiceImpl extends ServiceImpl<TemplateMapper, Template> i
 
     @Override
     public ApiResponse<Template> templateEdit(Template template) {
-        UserBO user = tokenService.getUser();
-        template.setUserId(user.getUserid());
         updateById(template);
         return ApiResponse.success("更新成功");
     }

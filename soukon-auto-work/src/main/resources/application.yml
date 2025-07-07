@@ -1,24 +1,113 @@
 server:
   port: 9915
+  compression:
+    enabled: true
+  error:
+    include-stacktrace: never
+
 spring:
-  config:
-    import: nacos:application-value.yml
   application:
-    name: common-test
-  profiles:
-    active: value,formal,private
+    name: auto-work-offline
+  
+  # 数据源配置 - SQLite
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:data/auto_work.db
+    username: 
+    password: 
+    hikari:
+      maximum-pool-size: 1  # SQLite单连接
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      
+  # JPA配置
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.community.dialect.SQLiteDialect
+        format_sql: false
+        
+  # JSON配置
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
-  cloud:
-    nacos:
-      discovery:
-        server-addr: 172.23.104.184
-      config:
-        server-addr: 172.23.104.184
-        file-extension: yml
-        username: nacos
-        password: nacos
-        namespace: 7cb64de9-1ec0-4ab2-a619-e30f60225978
+    time-zone: GMT+8
+    
+  # 缓存配置 - 使用Caffeine替代Redis
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=2h,expireAfterAccess=1h
+
+  # 静态资源配置
+  web:
+    resources:
+      static-locations: classpath:/static/
+      cache:
+        period: 31536000  # 1年缓存
+  mvc:
+    static-path-pattern: /**
+
+  # 文件上传配置
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
+      file-size-threshold: 2KB
+
+# MyBatis配置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.soukon.domain
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 日志配置
 logging:
   level:
-    com.soukon.mapper: debug
+    root: INFO
+    com.soukon: INFO
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN
+  file:
+    name: logs/auto-work.log
+  pattern:
+    file: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n'
+    console: '%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n'
+
+# 监控端点配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# 应用信息
+info:
+  app:
+    name: Auto Work 离线版
+    version: 1.0.0-offline
+    description: 自动化数据处理工作流系统（离线版）
+    encoding: UTF-8
+    java.version: ${java.version}
+
+# 自定义配置
+autowork:
+  offline:
+    enabled: true
+    data-dir: data
+    upload-dir: uploads
+    export-dir: exports
+    temp-dir: temp
+    backup:
+      auto-backup: true
+      backup-interval: 24h
+      max-backups: 7

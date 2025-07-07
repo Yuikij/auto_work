@@ -1,1 +1,12 @@
 .vscode/settings.json
+logs/auto-work.log
+data/auto_work.db
+data/auto_work.db-shm
+data/auto_work.db-wal
+soukon-auto-work/target/**
+
+soukon-auto-work/src/main/resources/static/*
+soukon-auto-work/target/classes/application-offline.yml
+soukon-auto-work/target/classes/application.yml
+soukon-auto-work/target/classes/com/soukon/config/SecurityConfig.class
+soukon-auto-work/target/classes/com/soukon/service/impl/TemplateServiceImpl.class

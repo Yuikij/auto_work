@@ -17,6 +17,7 @@
         <java.version>17</java.version>
         <sqlite.version>3.43.0.0</sqlite.version>
         <caffeine.version>3.1.8</caffeine.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
@@ -154,6 +155,20 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
+
+        <!-- JavaFX for WebView -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>17.0.10</version>
+            <classifier>win</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>17.0.10</version>
+            <classifier>win</classifier>
+        </dependency>
     </dependencies>
 
     <build>
@@ -163,7 +178,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.soukon.OfflineApplication</mainClass>
+                    <mainClass>com.soukon.DesktopApplication</mainClass>
                     <executable>true</executable>
                     <includeSystemScope>true</includeSystemScope>
                 </configuration>
@@ -172,52 +187,6 @@
                         <goals>
                             <goal>repackage</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Launch4j插件用于生成Windows exe文件 -->
-            <plugin>
-                <groupId>com.akathist.maven.plugins.launch4j</groupId>
-                <artifactId>launch4j-maven-plugin</artifactId>
-                <version>2.5.0</version>
-                <executions>
-                    <execution>
-                        <id>l4j-clui</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>launch4j</goal>
-                        </goals>
-                        <configuration>
-                            <headerType>console</headerType>
-                            <jar>${project.build.directory}/${project.build.finalName}.jar</jar>
-                            <outfile>${project.build.directory}/AutoWork-Offline-${project.version}.exe</outfile>
-                            <downloadUrl>https://www.oracle.com/java/technologies/downloads/</downloadUrl>
-                            <classPath>
-                                <mainClass>com.soukon.OfflineApplication</mainClass>
-                                <preCp>anything</preCp>
-                            </classPath>
-                            <icon>src/main/resources/static/favicon.ico</icon>
-                            <jre>
-                                <bundledJre64Bit>false</bundledJre64Bit>
-                                <bundledJreAsFallback>false</bundledJreAsFallback>
-                                <minVersion>17</minVersion>
-                                <jdkPreference>preferJre</jdkPreference>
-                                <runtimeBits>64/32</runtimeBits>
-                            </jre>
-                            <versionInfo>
-                                <fileVersion>1.0.0.0</fileVersion>
-                                <txtFileVersion>${project.version}</txtFileVersion>
-                                <fileDescription>Auto Work 离线版 - 数据处理工作流系统</fileDescription>
-                                <copyright>Soukon Technology</copyright>
-                                <productVersion>1.0.0.0</productVersion>
-                                <txtProductVersion>1.0.0</txtProductVersion>
-                                <productName>Auto Work Offline</productName>
-                                <companyName>Soukon Technology</companyName>
-                                <internalName>autowork</internalName>
-                                <originalFilename>AutoWork-Offline-${project.version}.exe</originalFilename>
-                            </versionInfo>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -238,11 +207,71 @@
                             <outputDirectory>${project.build.directory}/classes/static</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>../auto_work_web/build</directory>
+                                    <directory>${project.basedir}/../auto_work_web/build</directory>
                                     <filtering>false</filtering>
                                 </resource>
                             </resources>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-javafx-dependencies</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/modules</outputDirectory>
+                            <includeGroupIds>org.openjfx</includeGroupIds>
+                            <includeClassifiers>win</includeClassifiers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- jpackage插件用于创建原生安装包 -->
+            <plugin>
+                <groupId>org.panteleyev</groupId>
+                <artifactId>jpackage-maven-plugin</artifactId>
+                <version>1.5.0</version>
+                <configuration>
+                    <name>AutoWork-Offline</name>
+                    <appVersion>1.0.0</appVersion>
+                    <vendor>Soukon Technology</vendor>
+                    <destination>${project.build.directory}/dist</destination>
+                    <input>${project.build.directory}</input>
+                    <mainJar>${project.build.finalName}.jar</mainJar>
+                    <mainClass>com.soukon.DesktopApplication</mainClass>
+                    <icon>src/main/resources/static/favicon.ico</icon>
+                    <modulePaths>
+                        <path>${project.build.directory}/modules</path>
+                    </modulePaths>
+                    <addModules>
+                        <module>javafx.controls</module>
+                        <module>javafx.web</module>
+                    </addModules>
+                    <winConsole>false</winConsole>
+                    <winMenu>true</winMenu>
+                    <winMenuGroup>AutoWork Offline</winMenuGroup>
+                    <winShortcut>true</winShortcut>
+                    <!-- This UUID is for Windows installer upgrades -->
+                    <winUpgradeUuid>d1a52e5d-839c-4c4f-9b43-1b9f7a7558a3</winUpgradeUuid>
+                    <copyright>Copyright (c) 2024 Soukon Technology</copyright>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>jpackage</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jpackage</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
