@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.soukon.mapper.FilesMapper">
+    <insert id="insertBatch">
+        INSERT INTO files (name, type, zip_type, parent_id) VALUES
+        <foreach collection='list' item='item' index='index' separator=','>
+            (#{item.name}, #{item.type}, #{item.zipType}, #{item.parentId})
+        </foreach>
+
+    </insert>
+
+
+    <select id="findAllByParentIdRecursively" resultType="com.soukon.domain.Files">
+        WITH RECURSIVE file_hierarchy AS (
+            SELECT id, name, type, parent_id
+            FROM files
+            WHERE id = ${id} -- 查找给定 ID 的文件
+            UNION ALL
+            SELECT f.id, f.name, f.type, f.parent_id
+            FROM files f
+                     INNER JOIN file_hierarchy fh ON f.parent_id = fh.id
+        )
+        SELECT * FROM file_hierarchy;
+    </select>
+
+
+</mapper>

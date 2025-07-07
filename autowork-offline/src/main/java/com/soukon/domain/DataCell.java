@@ -1,0 +1,91 @@
+package com.soukon.domain;
+
+import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+
+@Data
+@TableName(value = "data_cell")
+public class DataCell {
+    @TableId(type = IdType.AUTO)
+    private Long id;
+    
+    private String name;
+    
+    // 通过sourceId找到对应的文件或者数据集
+    // 文件直接读，数据集或数据值的话，先计算
+    private Long sourceId;
+    
+    // 文件的情况
+    private Integer rowIndex;
+    private Integer columnIndex;
+    private String sheet;
+    
+    // 数据集的某个值,优先级比start end高
+    private Integer selectIndex;
+    
+    // 脚本的情况 - 存储为JSON字符串
+    private String script;
+    
+    // 用于截取
+    private Integer startIndex;
+    private Integer endIndex;
+    
+    // 是否是最终结果
+    private Boolean res = false;
+    
+    // 所属的模板id
+    private Long templateId;
+    
+    // 具体数值 - 存储为JSON字符串
+    private String specificValue;
+    
+    // 参数名
+    private String paramName;
+    
+    private Integer type = 0;
+    
+    @TableLogic
+    private Boolean deleted = false;
+    
+    @TableField(fill = FieldFill.INSERT)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdTime;
+    
+    @TableField(fill = FieldFill.UPDATE)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updatedTime;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DataCell dataCell = (DataCell) o;
+        return Objects.equals(id, dataCell.id) && 
+               Objects.equals(res, dataCell.res) && 
+               Objects.equals(templateId, dataCell.templateId) && 
+               Objects.equals(specificValue, dataCell.specificValue) && 
+               Objects.equals(type, dataCell.type) && 
+               Objects.equals(name, dataCell.name) && 
+               Objects.equals(sourceId, dataCell.sourceId) && 
+               Objects.equals(rowIndex, dataCell.rowIndex) && 
+               Objects.equals(columnIndex, dataCell.columnIndex) && 
+               Objects.equals(sheet, dataCell.sheet) && 
+               Objects.equals(selectIndex, dataCell.selectIndex) && 
+               Objects.equals(script, dataCell.script) && 
+               Objects.equals(startIndex, dataCell.startIndex) && 
+               Objects.equals(endIndex, dataCell.endIndex) && 
+               Objects.equals(paramName, dataCell.paramName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, sourceId, rowIndex, columnIndex, sheet, 
+                          selectIndex, script, startIndex, endIndex, res, 
+                          templateId, specificValue, paramName, type);
+    }
+}
