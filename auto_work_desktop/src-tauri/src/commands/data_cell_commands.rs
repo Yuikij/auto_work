@@ -276,3 +276,15 @@ pub async fn get_data_cell(
     
     Ok(data_cell)
 } 
+
+#[tauri::command]
+pub async fn get_data_cells(
+    pool: State<'_, SqlitePool>,
+    template_id: i64,
+) -> Result<Vec<DataCell>, String> {
+    sqlx::query_as("SELECT * FROM data_cells WHERE template_id = ? ORDER BY id")
+        .bind(template_id)
+        .fetch_all(&*pool)
+        .await
+        .map_err(|e| e.to_string())
+} 

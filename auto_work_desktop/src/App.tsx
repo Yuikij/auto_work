@@ -3,6 +3,7 @@ import { Layout, Tabs, Button, Space, message } from 'antd';
 import TemplateList from "./components/TemplateList";
 import FileList from "./components/FileList";
 import DataCellList from "./components/DataCellList";
+import Template from "./components/Template";
 import 'antd/dist/reset.css';
 
 import { invoke } from "@tauri-apps/api/core";
@@ -21,6 +22,7 @@ const TEMPLATE_TYPES = [
 
 function App() {
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
+  const [selectedTemplateType, setSelectedTemplateType] = useState<number>(1);
 
   const handleTemplateSelect = (id: number) => {
     setSelectedTemplateId(id);
@@ -83,8 +85,8 @@ function App() {
         <Sider width={350} theme="light" style={{ borderRight: '1px solid #f0f0f0' }}>
             <Tabs 
                 defaultActiveKey={TEMPLATE_TYPES[0].key} 
-                onChange={() => {
-                    // setActiveTemplateType(Number(key)); // No longer needed
+                onChange={(key: string) => {
+                    setSelectedTemplateType(Number(key));
                     setSelectedTemplateId(null); // Deselect when changing type
                 }}
                 centered
@@ -110,14 +112,18 @@ function App() {
             }}
           >
             {selectedTemplateId ? (
-              <Tabs defaultActiveKey="1">
-                <Tabs.TabPane tab="Files" key="1">
-                  <FileList templateId={selectedTemplateId} />
-                </Tabs.TabPane>
-                <Tabs.TabPane tab="Data Cells" key="2">
-                  <DataCellList templateId={selectedTemplateId} />
-                </Tabs.TabPane>
-              </Tabs>
+              selectedTemplateType === 1 ? (
+                <Template templateId={selectedTemplateId} />
+              ) : (
+                <Tabs defaultActiveKey="1">
+                  <Tabs.TabPane tab="Files" key="1">
+                    <FileList templateId={selectedTemplateId} />
+                  </Tabs.TabPane>
+                  <Tabs.TabPane tab="Data Cells" key="2">
+                    <DataCellList templateId={selectedTemplateId} />
+                  </Tabs.TabPane>
+                </Tabs>
+              )
             ) : (
               <div>Please select a template to see its details.</div>
             )}

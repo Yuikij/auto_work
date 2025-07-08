@@ -223,3 +223,35 @@ pub async fn delete_file(
         .map(|_| ())
         .map_err(|e| e.to_string())
 } 
+
+#[tauri::command]
+pub async fn add_file(
+    pool: State<'_, SqlitePool>,
+    template_id: i64,
+    name: String,
+    path: String,
+) -> Result<Files, String> {
+    // Insert file record into database
+    let result = sqlx::query(
+        "INSERT INTO files (name, path, template_id) VALUES (?, ?, ?)"
+    )
+    .bind(&name)
+    .bind(&path)
+    .bind(template_id)
+    .execute(&*pool)
+    .await
+    .map_err(|e| e.to_string())?;
+
+    let file_id = result.last_insert_rowid();
+
+    let new_file = Files {
+        id: file_id,
+        name: name,
+        path: Some(path),
+        template_id: template_id,
+        created_at: None, // This will be set by the database
+        updated_at: None, // This will be set by the database
+    };
+    
+    Ok(new_file)
+} 
