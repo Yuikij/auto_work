@@ -66,7 +66,7 @@ function App() {
     } catch (error: any) {
         console.error('Import failed:', error);
         message.error(`Import failed: ${error}`);
-    }
+  }
   };
 
 
