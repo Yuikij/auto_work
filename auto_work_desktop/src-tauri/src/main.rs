@@ -7,7 +7,7 @@ use sqlx::SqlitePool;
 mod commands;
 mod models;
 
-use commands::{template_commands, file_commands, data_cell_commands, import_export_commands, template_execution_commands};
+use commands::{template_commands, file_commands, data_cell_commands, import_export_commands, template_execution_commands, app_info_commands};
 
 fn get_db_path(app_handle: &AppHandle) -> String {
     let app_data_dir = app_handle
@@ -82,6 +82,8 @@ fn main() {
             import_export_commands::import_all_data,
             template_execution_commands::execute_template,
             template_execution_commands::get_templates,
+            app_info_commands::get_app_info,
+            app_info_commands::create_backup,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

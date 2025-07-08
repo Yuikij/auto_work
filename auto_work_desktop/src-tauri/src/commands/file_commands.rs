@@ -4,6 +4,8 @@ use crate::models::{DataCell, Files};
 use serde::{Deserialize, Serialize};
 use scraper::{Html, Selector};
 use infer;
+use calamine::{Reader, Xlsx, open_workbook_from_rs};
+use std::io::Cursor;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ParseResult {
@@ -110,16 +112,87 @@ pub async fn parse_data_cell(
     Ok(ParseResult { values })
 }
 
-fn parse_excel_content(_content: &[u8], _data_cell: &DataCell) -> Result<Vec<f64>, String> {
-    // TODO: Implement proper Excel parsing with calamine
-    // For now, return empty results
-    Ok(Vec::new())
+fn parse_excel_content(content: &[u8], data_cell: &DataCell) -> Result<Vec<f64>, String> {
+    
+    let cursor = Cursor::new(content);
+    let mut workbook: Xlsx<_> = open_workbook_from_rs(cursor).map_err(|e| e.to_string())?;
+    
+    let mut values = Vec::new();
+    
+    // Get the sheet name or use the first sheet
+    let sheet_name = data_cell.sheet_name.as_ref()
+        .or_else(|| data_cell.sheet.as_ref())
+        .map(|s| s.clone())
+        .or_else(|| workbook.sheet_names().first().cloned())
+        .ok_or("No sheet found")?;
+    
+    if let Ok(range) = workbook.worksheet_range(&sheet_name) {
+        // Handle specific cell
+        if let (Some(row), Some(col)) = (data_cell.row_index, data_cell.column_index) {
+            if let Some(cell_value) = range.get_value((row as u32 - 1, col as u32 - 1)) {
+                if let Ok(value) = cell_value.to_string().parse::<f64>() {
+                    values.push(value);
+                }
+            }
+            return Ok(values);
+        }
+        
+        // Handle column range
+        if let Some(col) = data_cell.column_index {
+            let start_row = data_cell.start_row.or(data_cell.start_index).unwrap_or(1) as u32 - 1;
+            let end_row = data_cell.end_row.or(data_cell.end_index)
+                .map(|r| r as u32 - 1)
+                .unwrap_or_else(|| range.get_size().0 - 1);
+            
+            for row in start_row..=end_row {
+                if let Some(cell_value) = range.get_value((row, col as u32 - 1)) {
+                    if let Ok(value) = cell_value.to_string().parse::<f64>() {
+                        values.push(value);
+                    }
+                }
+            }
+            return Ok(values);
+        }
+        
+        // Handle row range
+        if let Some(row) = data_cell.row_index {
+            let start_col = data_cell.start_col.or(data_cell.start_index).unwrap_or(1) as u32 - 1;
+            let end_col = data_cell.end_col.or(data_cell.end_index)
+                .map(|c| c as u32 - 1)
+                .unwrap_or_else(|| range.get_size().1 - 1);
+            
+            for col in start_col..=end_col {
+                if let Some(cell_value) = range.get_value((row as u32 - 1, col)) {
+                    if let Ok(value) = cell_value.to_string().parse::<f64>() {
+                        values.push(value);
+                    }
+                }
+            }
+        }
+    }
+    
+    Ok(values)
 }
 
 fn parse_html_content(content: &[u8], data_cell: &DataCell) -> Result<Vec<f64>, String> {
     let mut values = Vec::new();
     let html_content = String::from_utf8_lossy(content);
     let document = Html::parse_document(&html_content);
+    
+    // Support custom CSS selector from data_range field
+    if let Some(selector_str) = &data_cell.data_range {
+        if let Ok(custom_selector) = Selector::parse(selector_str) {
+            for element in document.select(&custom_selector) {
+                let text = element.text().collect::<String>().trim().to_string();
+                if let Ok(value) = text.parse::<f64>() {
+                    values.push(value);
+                }
+            }
+            return Ok(values);
+        }
+    }
+    
+    // Default table parsing
     let table_selector = Selector::parse("table tr").map_err(|e| e.to_string())?;
     let cell_selector = Selector::parse("td, th").map_err(|e| e.to_string())?;
     
