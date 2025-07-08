@@ -1,1 +1,4 @@
 .vscode/settings.json
+soukon-auto-work/target/
+auto_work_desktop/.vscode/
+node_modules/
