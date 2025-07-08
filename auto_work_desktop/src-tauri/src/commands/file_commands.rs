@@ -6,72 +6,59 @@ use scraper::{Html, Selector};
 use infer;
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct FileUploadRequest {
-    pub template_id: i64,
-    pub files: Vec<FileData>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct FileData {
-    pub name: String,
-    pub content: Vec<u8>, // Base64 decoded file content
-}
-
-#[derive(Debug, Serialize, Deserialize)]
 pub struct ParseResult {
     pub values: Vec<f64>,
 }
 
 #[tauri::command]
-pub async fn upload_files(
+pub async fn upload_file_to_template(
     app_handle: AppHandle,
     pool: State<'_, SqlitePool>,
-    request: FileUploadRequest,
-) -> Result<Vec<Files>, String> {
-    let mut uploaded_files = Vec::new();
-    
-    for file_data in request.files {
-        // Save file to app data directory
-        let app_data_dir = app_handle
-            .path()
-            .app_data_dir()
-            .map_err(|e| e.to_string())?;
-        
-        let file_path = app_data_dir.join("uploads").join(&file_data.name);
-        
-        // Ensure directory exists
-        if let Some(parent) = file_path.parent() {
-            std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
-        }
-        
-        // Write file content
-        std::fs::write(&file_path, &file_data.content).map_err(|e| e.to_string())?;
-        
-        // Insert file record into database
-        let result = sqlx::query(
-            "INSERT INTO files (name, path, template_id) VALUES (?, ?, ?)"
-        )
-        .bind(&file_data.name)
-        .bind(file_path.to_string_lossy().to_string())
-        .bind(request.template_id)
-        .execute(&*pool)
-        .await
+    template_id: i64,
+    name: String,
+    content: Vec<u8>,
+) -> Result<Files, String> {
+    // Save file to app data directory
+    let app_data_dir = app_handle
+        .path()
+        .app_data_dir()
         .map_err(|e| e.to_string())?;
-        
-        let file_id = result.last_insert_rowid();
-        
-        uploaded_files.push(Files {
-            id: file_id,
-            name: file_data.name,
-            path: Some(file_path.to_string_lossy().to_string()),
-            template_id: request.template_id,
-            created_at: None,
-            updated_at: None,
-        });
+
+    let file_path = app_data_dir.join("uploads").join(&name);
+
+    // Ensure directory exists
+    if let Some(parent) = file_path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
+
+    // Write file content
+    std::fs::write(&file_path, &content).map_err(|e| e.to_string())?;
+
+    // Insert file record into database
+    let result = sqlx::query(
+        "INSERT INTO files (name, path, template_id) VALUES (?, ?, ?)"
+    )
+    .bind(&name)
+    .bind(file_path.to_string_lossy().to_string())
+    .bind(template_id)
+    .execute(&*pool)
+    .await
+    .map_err(|e| e.to_string())?;
+
+    let file_id = result.last_insert_rowid();
+
+    let new_file = Files {
+        id: file_id,
+        name: name,
+        path: Some(file_path.to_string_lossy().to_string()),
+        template_id: template_id,
+        created_at: None, // This will be set by the database
+        updated_at: None, // This will be set by the database
+    };
     
-    Ok(uploaded_files)
+    Ok(new_file)
 }
+
 
 #[tauri::command]
 pub async fn parse_data_cell(
@@ -201,7 +188,7 @@ fn cell_to_f64(cell: &dyn std::fmt::Debug) -> Option<f64> {
 }
 
 #[tauri::command]
-pub async fn list_files(
+pub async fn list_files_by_template(
     pool: State<'_, SqlitePool>,
     template_id: i64,
 ) -> Result<Vec<Files>, String> {

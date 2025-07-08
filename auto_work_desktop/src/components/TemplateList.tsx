@@ -13,9 +13,10 @@ interface Template {
 interface TemplateListProps {
     type: number; // This is the type_id
     onSelect?: (id: number) => void;
+    selectedId?: number | null;
 }
 
-const TemplateList: React.FC<TemplateListProps> = ({ type, onSelect }) => {
+const TemplateList: React.FC<TemplateListProps> = ({ type, onSelect, selectedId }) => {
     const [data, setData] = useState<Template[]>([]);
 
     const getTemplates = async () => {
@@ -101,6 +102,7 @@ const TemplateList: React.FC<TemplateListProps> = ({ type, onSelect }) => {
                 onDelete={deleteTemplate} 
                 onAdd={handleAddBlur}
                 onSelect={handleSelect}
+                selectedId={selectedId}
             />
         </div>
     );

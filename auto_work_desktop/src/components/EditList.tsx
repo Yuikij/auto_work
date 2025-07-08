@@ -12,9 +12,10 @@ interface EditListProps<T extends DataItem> {
     onEdit: (item: T, e: React.FocusEvent<HTMLInputElement>) => void;
     onDelete: (item: T) => void;
     onSelect?: (item: T) => void;
+    selectedId?: number | null;
 }
 
-const EditList = <T extends DataItem>({ dataList, onAdd, onEdit, onDelete, onSelect }: EditListProps<T>) => {
+const EditList = <T extends DataItem>({ dataList, onAdd, onEdit, onDelete, onSelect, selectedId }: EditListProps<T>) => {
     const [isAdding, setIsAdding] = useState(false);
     const [editingId, setEditingId] = useState<number | null>(null);
 
@@ -61,9 +62,14 @@ const EditList = <T extends DataItem>({ dataList, onAdd, onEdit, onDelete, onSel
                 dataSource={dataList}
                 renderItem={(item) => (
                     <List.Item
+                        style={{ 
+                            backgroundColor: selectedId === item.id ? '#e6f7ff' : 'transparent',
+                            cursor: 'pointer'
+                        }}
+                        onClick={() => handleSelectItem(item)}
                         actions={[
-                            <Button type="link" onClick={() => setEditingId(item.id)}>Edit</Button>,
-                            <Button type="link" danger onClick={() => onDelete(item)}>Delete</Button>,
+                            <Button type="link" size="small" onClick={(e) => { e.stopPropagation(); setEditingId(item.id); }}>Edit</Button>,
+                            <Button type="link" size="small" danger onClick={(e) => { e.stopPropagation(); onDelete(item); }}>Delete</Button>,
                         ]}
                     >
                         {editingId === item.id ? (
@@ -71,10 +77,11 @@ const EditList = <T extends DataItem>({ dataList, onAdd, onEdit, onDelete, onSel
                                 defaultValue={item.name}
                                 onBlur={(e) => handleEditItem(item, e)}
                                 onPressEnter={(e) => (e.target as HTMLInputElement).blur()}
+                                onClick={(e) => e.stopPropagation()}
                                 autoFocus
                             />
                         ) : (
-                            <div onClick={() => handleSelectItem(item)} style={{ cursor: 'pointer', width: '100%' }}>
+                            <div style={{ width: '100%', padding: '4px 0' }}>
                                 {item.name}
                             </div>
                         )}

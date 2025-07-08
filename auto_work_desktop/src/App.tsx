@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Layout, Menu, Tabs, Button, Space, message } from 'antd';
+import { Layout, Tabs, Button, Space, message } from 'antd';
 import TemplateList from "./components/TemplateList";
 import FileList from "./components/FileList";
 import DataCellList from "./components/DataCellList";
@@ -12,16 +12,18 @@ import { writeTextFile, readTextFile } from '@tauri-apps/plugin-fs';
 
 const { Header, Content, Sider } = Layout;
 
+// Define human-readable names for template types
+const TEMPLATE_TYPES = [
+  { key: '1', title: 'File Templates', type: 1 },
+  { key: '2', title: 'Data Templates', type: 2 },
+  { key: '3', title: 'Script Templates', type: 3 },
+];
+
 function App() {
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
 
   const handleTemplateSelect = (id: number) => {
-    // A simple reload to ensure all components refetch data after import/delete.
-    if (selectedTemplateId !== id) {
-        setSelectedTemplateId(id);
-    } else {
-        window.location.reload();
-    }
+    setSelectedTemplateId(id);
   };
 
   const handleExport = async () => {
@@ -71,27 +73,40 @@ function App() {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Header className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['1']} style={{ flex: 1 }}>
-          <Menu.Item key="1">Templates</Menu.Item>
-        </Menu>
+        <div style={{ color: 'white', fontSize: '20px' }}>Auto Work</div>
         <Space>
-            <Button type="primary" onClick={handleExport}>Export</Button>
-            <Button onClick={handleImport}>Import</Button>
+            <Button type="primary" onClick={handleExport}>Export All Data</Button>
+            <Button onClick={handleImport}>Import All Data</Button>
         </Space>
       </Header>
       <Layout>
-        <Sider width={300} className="site-layout-background">
-          <TemplateList type={1} onSelect={handleTemplateSelect} />
-          <TemplateList type={2} onSelect={handleTemplateSelect} />
-          <TemplateList type={3} onSelect={handleTemplateSelect} />
+        <Sider width={350} theme="light" style={{ borderRight: '1px solid #f0f0f0' }}>
+            <Tabs 
+                defaultActiveKey={TEMPLATE_TYPES[0].key} 
+                onChange={() => {
+                    // setActiveTemplateType(Number(key)); // No longer needed
+                    setSelectedTemplateId(null); // Deselect when changing type
+                }}
+                centered
+            >
+                {TEMPLATE_TYPES.map(template => (
+                    <Tabs.TabPane tab={template.title} key={template.key}>
+                        <TemplateList 
+                            type={template.type} 
+                            onSelect={handleTemplateSelect} 
+                            selectedId={selectedTemplateId}
+                        />
+                    </Tabs.TabPane>
+                ))}
+            </Tabs>
         </Sider>
         <Layout style={{ padding: '0 24px 24px' }}>
           <Content
-            className="site-layout-background"
             style={{
               padding: 24,
               margin: 0,
               minHeight: 280,
+              background: '#fff',
             }}
           >
             {selectedTemplateId ? (
