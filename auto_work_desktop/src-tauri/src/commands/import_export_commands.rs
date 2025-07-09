@@ -83,9 +83,9 @@ pub async fn import_all_data(db: tauri::State<'_, SqlitePool>, data_json: String
             r#"
             INSERT INTO data_cell (
                 id, name, source_id, row_index, column_index, sheet, 
-                select_index, script, start_index, end_index, res, 
+                script, start_index, end_index, res, 
                 template_id, specific_value, param_name, type, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             "#
         )
         .bind(dc.id)
@@ -94,7 +94,6 @@ pub async fn import_all_data(db: tauri::State<'_, SqlitePool>, data_json: String
         .bind(dc.row_index)
         .bind(dc.column_index)
         .bind(dc.sheet)
-        .bind(dc.select_index)
         .bind(dc.script)
         .bind(dc.start_index)
         .bind(dc.end_index)

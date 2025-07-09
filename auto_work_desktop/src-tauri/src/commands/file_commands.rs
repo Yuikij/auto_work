@@ -191,7 +191,7 @@ fn parse_html_content(content: &[u8], data_cell: &DataCell) -> Result<Vec<f64>, 
         if let Some(col_str) = &data_cell.column_index {
             if let Some(target_col) = excel_col_to_index(col_str) {
                 let start_row = data_cell.start_index.unwrap_or(1) - 1;
-                let end_row = data_cell.end_index.unwrap_or(rows.len() as i32);
+                let end_row = data_cell.end_index.unwrap_or(rows.len() as i64);
                 
                 if row_index >= start_row as usize && row_index < end_row as usize {
                     if let Some(cell) = cells.get(target_col as usize) {
@@ -210,9 +210,9 @@ fn parse_html_content(content: &[u8], data_cell: &DataCell) -> Result<Vec<f64>, 
         if let Some(target_row) = data_cell.row_index {
             if row_index == (target_row - 1) as usize {
                 let start_col = data_cell.start_index.unwrap_or(1) - 1;
-                let end_col = data_cell.end_index.unwrap_or(cells.len() as i32);
+                let end_col = data_cell.end_index.unwrap_or(cells.len() as i64);
                 
-                for col_index in start_col as usize..end_col.min(cells.len() as i32) as usize {
+                for col_index in start_col as usize..end_col.min(cells.len() as i64) as usize {
                     if let Some(cell) = cells.get(col_index) {
                         let collected_text: String = cell.text().collect();
                         let text = collected_text.trim().to_string();

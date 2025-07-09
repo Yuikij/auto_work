@@ -20,11 +20,11 @@ CREATE TABLE IF NOT EXISTS files (
 CREATE TABLE IF NOT EXISTS data_cell (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    source_id INTEGER,
+    source_id INTEGER, -- For 'File' type, references files(id)
+    source_cell_id INTEGER, -- For 'Data' type, references data_cell(id)
     row_index INTEGER,
     column_index TEXT,
     sheet TEXT,
-    select_index INTEGER,
     script TEXT, -- JSON string for script
     start_index INTEGER,
     end_index INTEGER,
@@ -36,5 +36,6 @@ CREATE TABLE IF NOT EXISTS data_cell (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (template_id) REFERENCES templates (id),
-    FOREIGN KEY (source_id) REFERENCES files (id)
+    FOREIGN KEY (source_id) REFERENCES files (id),
+    FOREIGN KEY (source_cell_id) REFERENCES data_cell (id)
 ); 

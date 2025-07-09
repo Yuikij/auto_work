@@ -33,6 +33,10 @@ fn get_db_path(app_handle: &AppHandle) -> String {
 // }
 
 fn main() {
+    // Set default log level if not set
+    if std::env::var("RUST_LOG").is_err() {
+        std::env::set_var("RUST_LOG", "info");
+    }
     pretty_env_logger::init();
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())

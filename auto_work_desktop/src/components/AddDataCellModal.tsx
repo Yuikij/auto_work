@@ -43,8 +43,29 @@ const AddDataCellModal: React.FC<AddDataCellModalProps> = ({ open, onCancel, onO
         form.validateFields()
             .then(values => {
                 form.resetFields();
-                const finalValues = initialValues ? { ...initialValues, ...values } : values;
-                onOk({ ...finalValues, type: selectedType });
+                
+                let final_source_id = undefined;
+                let final_source_cell_id = undefined;
+
+                if (selectedType === 1) { // 文件
+                    final_source_id = values.source_id;
+                } else if (selectedType === 3) { // 其他数据单元
+                    final_source_cell_id = values.source_id; // The form item is named source_id
+                }
+
+                // Ensure numeric fields are numbers, not strings from form inputs
+                const numericValues = {
+                    ...values,
+                    type: selectedType,
+                    source_id: final_source_id ? parseInt(final_source_id, 10) : undefined,
+                    source_cell_id: final_source_cell_id ? parseInt(final_source_cell_id, 10) : undefined,
+                    row_index: values.row_index ? parseInt(values.row_index, 10) : undefined,
+                    start_index: values.start_index ? parseInt(values.start_index, 10) : undefined,
+                    end_index: values.end_index ? parseInt(values.end_index, 10) : undefined,
+                };
+                
+                const finalValues = initialValues ? { ...initialValues, ...numericValues } : numericValues;
+                onOk(finalValues);
             })
             .catch(info => {
                 console.log('Validate Failed:', info);
@@ -64,8 +85,11 @@ const AddDataCellModal: React.FC<AddDataCellModalProps> = ({ open, onCancel, onO
                         <Form.Item name="sheet" label="输入表名">
                             <Input placeholder="例如: Sheet1" />
                         </Form.Item>
-                        <Form.Item name="column_index" label="列号" rules={[{ required: true }]}>
-                            <Input placeholder="例如: A, B, C..." />
+                        <Form.Item name="row_index" label="行号">
+                            <Input placeholder="例如: 1, 2, 3..." type="number" />
+                        </Form.Item>
+                        <Form.Item name="column_index" label="列号">
+                            <Input placeholder="例如: A, B, C... 或 1, 2, 3..." />
                         </Form.Item>
                         <Form.Item name="start_index" label="选择起始索引">
                             <Input type="number" />
@@ -81,13 +105,21 @@ const AddDataCellModal: React.FC<AddDataCellModalProps> = ({ open, onCancel, onO
                         <FormulaBuilder dataCells={dataCells} />
                     </Form.Item>
                 );
-            case 3: // 其他数据单元 (for calculation)
+            case 3: // 其他数据单元 (for slicing)
                 return (
-                     <Form.Item name="source_id" label="选择其他数据单元" rules={[{ required: true }]}>
-                        <Select mode="multiple" placeholder="请选择一个或多个数据单元">
-                             {dataCells.map(cell => <Option key={cell.id} value={cell.id}>{cell.name}</Option>)}
-                        </Select>
-                    </Form.Item>
+                    <>
+                        <Form.Item name="source_id" label="选择一个数据单元作为来源" rules={[{ required: true }]}>
+                            <Select placeholder="请选择一个数据单元">
+                                {dataCells.map(cell => <Option key={cell.id} value={cell.id}>{cell.name}</Option>)}
+                            </Select>
+                        </Form.Item>
+                        <Form.Item name="start_index" label="选择起始索引">
+                            <Input type="number" placeholder="从 1 开始" />
+                        </Form.Item>
+                        <Form.Item name="end_index" label="选择终止索引">
+                            <Input type="number" placeholder="留空则为到底" />
+                        </Form.Item>
+                    </>
                 );
             case 4: // 参数
                 return (

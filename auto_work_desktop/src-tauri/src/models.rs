@@ -10,23 +10,29 @@ pub struct Template {
     pub updated_at: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, sqlx::FromRow, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, sqlx::FromRow)]
 pub struct DataCell {
     pub id: i64,
-    pub name: String,
-    pub source_id: Option<i64>,
-    pub row_index: Option<i32>,
-    pub column_index: Option<String>,
-    pub sheet: Option<String>,
-    pub select_index: Option<i32>,
-    pub script: Option<String>,
-    pub start_index: Option<i32>,
-    pub end_index: Option<i32>,
-    pub res: bool,
     pub template_id: i64,
-    pub specific_value: Option<String>,
-    pub param_name: Option<String>,
+    pub name: String,
     pub r#type: i32,
+    pub res: bool,
+    // Fields for 'File' type
+    pub source_id: Option<i64>,
+    // Fields for 'Data' type
+    pub source_cell_id: Option<i64>,
+    pub sheet: Option<String>,
+    pub row_index: Option<i64>,
+    pub column_index: Option<String>,
+    pub start_index: Option<i64>,
+    pub end_index: Option<i64>,
+    // Field for 'Script' type
+    pub script: Option<String>,
+    // Field for 'Value' type
+    pub specific_value: Option<String>,
+    // Field for 'Param' type
+    pub param_name: Option<String>,
+    // Timestamps
     pub created_at: Option<String>,
     pub updated_at: Option<String>,
 }

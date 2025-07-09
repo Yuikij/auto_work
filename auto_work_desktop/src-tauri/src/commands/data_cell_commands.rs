@@ -7,13 +7,13 @@ use serde::{Deserialize, Serialize};
 pub struct DataCellRequest {
     pub name: String,
     pub source_id: Option<i64>,
-    pub row_index: Option<i32>,
+    pub source_cell_id: Option<i64>,
+    pub row_index: Option<i64>,
     pub column_index: Option<String>,
     pub sheet: Option<String>,
-    pub select_index: Option<i32>,
     pub script: Option<String>,
-    pub start_index: Option<i32>,
-    pub end_index: Option<i32>,
+    pub start_index: Option<i64>,
+    pub end_index: Option<i64>,
     pub res: bool,
     pub template_id: i64,
     pub specific_value: Option<String>,
@@ -41,17 +41,17 @@ pub async fn add_data_cell(
     request: DataCellRequest,
 ) -> Result<DataCell, String> {
     let result = sqlx::query(
-        "INSERT INTO data_cell (name, source_id, row_index, column_index, sheet, 
-         select_index, script, start_index, end_index, res, template_id, 
+        "INSERT INTO data_cell (name, source_id, source_cell_id, row_index, column_index, sheet, 
+         script, start_index, end_index, res, template_id, 
          specific_value, param_name, type) 
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     )
     .bind(&request.name)
     .bind(request.source_id)
+    .bind(request.source_cell_id)
     .bind(request.row_index)
     .bind(&request.column_index)
     .bind(&request.sheet)
-    .bind(request.select_index)
     .bind(&request.script)
     .bind(request.start_index)
     .bind(request.end_index)
@@ -76,17 +76,17 @@ pub async fn update_data_cell(
     request: DataCellRequest,
 ) -> Result<DataCell, String> {
     sqlx::query(
-        "UPDATE data_cell SET name = ?, source_id = ?, row_index = ?, column_index = ?, 
-         sheet = ?, select_index = ?, script = ?, start_index = ?, end_index = ?, 
+        "UPDATE data_cell SET name = ?, source_id = ?, source_cell_id = ?, row_index = ?, column_index = ?, 
+         sheet = ?, script = ?, start_index = ?, end_index = ?, 
          res = ?, specific_value = ?, param_name = ?, type = ?, updated_at = CURRENT_TIMESTAMP 
          WHERE id = ?"
     )
     .bind(&request.name)
     .bind(request.source_id)
+    .bind(request.source_cell_id)
     .bind(request.row_index)
     .bind(&request.column_index)
     .bind(&request.sheet)
-    .bind(request.select_index)
     .bind(&request.script)
     .bind(request.start_index)
     .bind(request.end_index)
