@@ -1,11 +1,13 @@
 import React from 'react';
 import {BrowserRouter as Router, Route, Routes, Navigate} from 'react-router-dom';
-import OfflineHome from "./components/offline/OfflineHome"; // 离线版本主页
+import LoginPage from "./components/login/LoginPage";
+import Home from "./components/home/Home"; // 假设你有一个主页组件
 
 const AppRouter = () => (
     <Router>
         <Routes>
-            <Route path="/home" element={<OfflineHome />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/" element={<Navigate to="/home" />} />
         </Routes>
     </Router>

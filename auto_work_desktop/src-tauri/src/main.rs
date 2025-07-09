@@ -3,6 +3,8 @@
 
 use tauri::{Manager, AppHandle};
 use sqlx::SqlitePool;
+use sqlx::sqlite::SqliteConnectOptions;
+use std::str::FromStr;
 
 mod commands;
 mod models;
@@ -37,29 +39,29 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             let app_handle = app.handle().clone();
-            tauri::async_runtime::spawn(async move {
+            
+            // Perform setup in an async block
+            tauri::async_runtime::block_on(async move {
                 let db_path = get_db_path(&app_handle);
                 let db_url = format!("sqlite:{}", db_path);
                 
-                let pool = SqlitePool::connect(&db_url).await.unwrap();
-                
-                // info!("Running database migrations...");
-                // let migration_result = sqlx::migrate!("./migrations")
-                //     .run(&pool)
-                //     .await;
+                let connect_options = SqliteConnectOptions::from_str(&db_url)
+                    .expect("Failed to parse database URL")
+                    .create_if_missing(true);
 
-                // match migration_result {
-                //     Ok(_) => {
-                //         info!("Database migration successful!");
-                //     }
-                //     Err(e) => {
-                //         error!("Database migration failed: {:?}", e);
-                //         panic!("Database migration failed: {:?}", e);
-                //     }
-                // }
-                
+                let pool = SqlitePool::connect_with(connect_options)
+                    .await
+                    .expect("Failed to connect to database");
+
+                // Run migrations
+                sqlx::migrate!("./migrations")
+                    .run(&pool)
+                    .await
+                    .expect("Database migration failed");
+
                 app_handle.manage(pool);
             });
+            
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

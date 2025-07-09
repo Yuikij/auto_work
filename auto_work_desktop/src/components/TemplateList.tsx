@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import EditList from "./EditList";
 import { invoke } from '@tauri-apps/api/core';
-import { message } from 'antd';
+import { Card, message } from 'antd';
 
 interface Template {
     id: number;
@@ -94,17 +94,16 @@ const TemplateList: React.FC<TemplateListProps> = ({ type, onSelect, selectedId 
     }
 
     return (
-        <div>
-            <h3 style={{ margin: '16px 8px 8px' }}>Type {type} Templates</h3>
+        <Card title="模板列表" style={{ margin: '16px' }}>
             <EditList 
                 dataList={data} 
-                onEdit={handleBlur} 
+                onEdit={editTemplate} 
                 onDelete={deleteTemplate} 
-                onAdd={handleAddBlur}
+                onAdd={addTemplate}
                 onSelect={handleSelect}
                 selectedId={selectedId}
             />
-        </div>
+        </Card>
     );
 };
 

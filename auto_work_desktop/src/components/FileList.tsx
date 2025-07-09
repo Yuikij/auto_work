@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import { List, Button, Upload, message, Modal, Row, Col, Typography } from 'antd';
+import { List, Button, Upload, message, Modal, Row, Col, Typography, Card } from 'antd';
 import { UploadOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
 
@@ -115,7 +115,7 @@ const FileList: React.FC<FileListProps> = ({ templateId }) => {
     };
 
     return (
-        <div>
+        <Card title="文件列表详情" style={{ margin: '16px' }}>
             <Row gutter={16} style={{ marginBottom: 16 }}>
                 <Col>
                     <Upload {...uploadProps}>
@@ -152,7 +152,7 @@ const FileList: React.FC<FileListProps> = ({ templateId }) => {
                     </List.Item>
                 )}
             />
-        </div>
+        </Card>
     );
 };
 

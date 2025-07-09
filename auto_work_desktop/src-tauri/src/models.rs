@@ -6,9 +6,7 @@ pub struct Template {
     pub name: String,
     pub content: Option<String>,
     pub type_id: i32,
-    #[serde(rename = "createdAt")]
     pub created_at: Option<String>,
-    #[serde(rename = "updatedAt")]
     pub updated_at: Option<String>,
 }
 
@@ -18,28 +16,18 @@ pub struct DataCell {
     pub name: String,
     pub source_id: Option<i64>,
     pub row_index: Option<i32>,
-    pub column_index: Option<i32>,
-    pub sheet_name: Option<String>,
-    pub start_row: Option<i32>,
-    pub end_row: Option<i32>,
-    pub start_col: Option<i32>,
-    pub end_col: Option<i32>,
-    pub data_type: Option<i32>,
-    pub data_range: Option<String>,
-    pub description: Option<String>,
+    pub column_index: Option<String>,
     pub sheet: Option<String>,
     pub select_index: Option<i32>,
-    pub script: Option<String>, // JSON string for script
+    pub script: Option<String>,
     pub start_index: Option<i32>,
     pub end_index: Option<i32>,
     pub res: bool,
     pub template_id: i64,
-    pub specific_value: Option<String>, // JSON string for List<Double>
+    pub specific_value: Option<String>,
     pub param_name: Option<String>,
     pub r#type: i32,
-    #[serde(rename = "createdAt")]
     pub created_at: Option<String>,
-    #[serde(rename = "updatedAt")]
     pub updated_at: Option<String>,
 }
 
@@ -49,9 +37,7 @@ pub struct Files {
     pub name: String,
     pub path: Option<String>,
     pub template_id: i64,
-    #[serde(rename = "createdAt")]
     pub created_at: Option<String>,
-    #[serde(rename = "updatedAt")]
     pub updated_at: Option<String>,
 }
 

@@ -16,7 +16,7 @@ pub async fn execute_template(
 
     // Get all data cells for this template
     let mut data_cells: Vec<DataCell> = sqlx::query_as(
-        "SELECT * FROM data_cells WHERE template_id = ? ORDER BY id"
+        "SELECT * FROM data_cell WHERE template_id = ? ORDER BY id"
     )
     .bind(template_id)
     .fetch_all(&*pool)
@@ -72,7 +72,7 @@ pub async fn execute_template(
 
     // Fetch updated data cells
     let updated_data_cells: Vec<DataCell> = sqlx::query_as(
-        "SELECT * FROM data_cells WHERE template_id = ? ORDER BY id"
+        "SELECT * FROM data_cell WHERE template_id = ? ORDER BY id"
     )
     .bind(template_id)
     .fetch_all(&*pool)
@@ -89,7 +89,7 @@ async fn update_data_cell_value(
 ) -> Result<(), String> {
     let value_str = value.to_string();
     sqlx::query(
-        "UPDATE data_cells SET specific_value = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+        "UPDATE data_cell SET specific_value = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?"
     )
     .bind(value_str)
     .bind(data_cell_id)
@@ -101,9 +101,9 @@ async fn update_data_cell_value(
 }
 
 fn extract_data_from_file(
-    file: &Files,
-    data_cell: &DataCell,
-    params: &HashMap<String, String>,
+    _file: &Files,
+    _data_cell: &DataCell,
+    _params: &HashMap<String, String>,
 ) -> Result<Value, String> {
     // This is a placeholder implementation
     // In a real implementation, you would:
@@ -116,8 +116,8 @@ fn extract_data_from_file(
 }
 
 fn execute_script(
-    script: &str,
-    params: &HashMap<String, String>,
+    _script: &str,
+    _params: &HashMap<String, String>,
 ) -> Result<Value, String> {
     // This is a placeholder implementation
     // In a real implementation, you would:

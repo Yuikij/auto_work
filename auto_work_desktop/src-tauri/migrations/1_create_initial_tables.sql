@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS templates (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     content TEXT,
+    type_id INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -21,7 +22,7 @@ CREATE TABLE IF NOT EXISTS data_cell (
     name TEXT NOT NULL,
     source_id INTEGER,
     row_index INTEGER,
-    column_index INTEGER,
+    column_index TEXT,
     sheet TEXT,
     select_index INTEGER,
     script TEXT, -- JSON string for script

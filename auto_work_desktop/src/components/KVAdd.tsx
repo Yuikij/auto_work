@@ -15,26 +15,30 @@ interface KVAddProps {
 
 const KVAdd: React.FC<KVAddProps> = ({ keyOptions, onChange }) => {
   const [kvPairs, setKvPairs] = useState<KVPair[]>([]);
-  const [selectedKey, setSelectedKey] = useState<string>(keyOptions[0] || '');
-  const [value, setValue] = useState<string>('');
-
+  const [currentKey, setCurrentKey] = useState<string>('');
+  const [currentValue, setCurrentValue] = useState<string>('');
+  
   useEffect(() => {
-    if (keyOptions.length > 0 && !selectedKey) {
-      setSelectedKey(keyOptions[0]);
+    if (keyOptions && keyOptions.length > 0) {
+      setCurrentKey(keyOptions[0]);
     }
-  }, [keyOptions, selectedKey]);
+  }, [keyOptions]);
 
   const addKvPair = () => {
-    if (selectedKey && value && !kvPairs.some(pair => pair.key === selectedKey)) {
-      const newPairs = [...kvPairs, { key: selectedKey, value }];
+    if (currentKey && currentValue && !kvPairs.some(pair => pair.key === currentKey)) {
+      const newPairs = [...kvPairs, { key: currentKey, value: currentValue }];
       setKvPairs(newPairs);
       onChange(newPairs);
       
-      // Reset to next available key
-      const usedKeys = new Set(newPairs.map(p => p.key));
-      const nextKey = keyOptions.find(k => !usedKeys.has(k));
-      setSelectedKey(nextKey || '');
-      setValue('');
+      // Reset inputs
+      setCurrentValue('');
+      if (keyOptions && keyOptions.length > 0) {
+        const usedKeys = new Set(newPairs.map(p => p.key));
+        const nextKey = keyOptions.find(k => !usedKeys.has(k));
+        setCurrentKey(nextKey || '');
+      } else {
+        setCurrentKey('');
+      }
     }
   };
 
@@ -44,59 +48,60 @@ const KVAdd: React.FC<KVAddProps> = ({ keyOptions, onChange }) => {
     onChange(newPairs);
   };
 
-  const handleKeyChange = (key: string) => {
-    setSelectedKey(key);
-  };
-
-  const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
-  };
-
   return (
-    <div style={{ padding: 20 }}>
-      <div style={{ display: 'flex', marginBottom: 16 }}>
-        <Select 
-          value={selectedKey} 
-          onChange={handleKeyChange} 
-          style={{ width: 120, marginRight: 8 }}
-          disabled={keyOptions.length === 0}
-        >
-          {keyOptions.map((key) => (
-            <Option 
-              key={key} 
-              value={key} 
-              disabled={kvPairs.some(pair => pair.key === key)}
-            >
-              {key}
-            </Option>
-          ))}
-        </Select>
+    <div>
+      <div style={{ display: 'flex', marginBottom: 16, gap: '8px' }}>
+        {keyOptions && keyOptions.length > 0 ? (
+          <Select 
+            value={currentKey} 
+            onChange={(val) => setCurrentKey(val)} 
+            style={{ width: 150 }}
+          >
+            {keyOptions.map((key) => (
+              <Option 
+                key={key} 
+                value={key} 
+                disabled={kvPairs.some(pair => pair.key === key)}
+              >
+                {key}
+              </Option>
+            ))}
+          </Select>
+        ) : (
+          <Input 
+            value={currentKey}
+            onChange={(e) => setCurrentKey(e.target.value)}
+            placeholder="参数名 (Key)"
+            style={{ width: 150 }}
+          />
+        )}
         <Input 
-          value={value} 
-          onChange={handleValueChange} 
-          style={{ width: 200, marginRight: 8 }} 
-          placeholder="Enter value"
+          value={currentValue} 
+          onChange={(e) => setCurrentValue(e.target.value)} 
+          placeholder="参数值 (Value)"
+          style={{ flex: 1 }} 
         />
         <Button 
           type="primary" 
           onClick={addKvPair} 
-          disabled={!selectedKey || !value}
+          disabled={!currentKey || !currentValue}
         >
-          添加参数
+          添加
         </Button>
       </div>
       <List
         bordered
+        size="small"
         dataSource={kvPairs}
         renderItem={(item) => (
           <List.Item
             actions={[
-              <Button type="link" onClick={() => deleteKvPair(item.key)}>
+              <Button type="link" onClick={() => deleteKvPair(item.key)} danger>
                 删除
               </Button>
             ]}
           >
-            {item.key}: {item.value}
+            <span style={{ fontWeight: 'bold' }}>{item.key}:</span> {item.value}
           </List.Item>
         )}
       />

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { List, Button, Input, Row, Col } from 'antd';
+import { List, Button, Input, Row, Col, Modal } from 'antd';
 
 interface DataItem {
     id: number;
@@ -8,56 +8,68 @@ interface DataItem {
 
 interface EditListProps<T extends DataItem> {
     dataList: T[];
-    onAdd: (e: React.FocusEvent<HTMLInputElement>) => void;
-    onEdit: (item: T, e: React.FocusEvent<HTMLInputElement>) => void;
+    onAdd: (name: string) => void;
+    onEdit: (item: T, newName: string) => void;
     onDelete: (item: T) => void;
     onSelect?: (item: T) => void;
     selectedId?: number | null;
 }
 
 const EditList = <T extends DataItem>({ dataList, onAdd, onEdit, onDelete, onSelect, selectedId }: EditListProps<T>) => {
-    const [isAdding, setIsAdding] = useState(false);
-    const [editingId, setEditingId] = useState<number | null>(null);
+    const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+    const [newItemName, setNewItemName] = useState('');
 
-    const handleAddItem = (e: React.FocusEvent<HTMLInputElement>) => {
-        onAdd(e);
-        setIsAdding(false);
+    const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+    const [editingItem, setEditingItem] = useState<T | null>(null);
+    const [editingName, setEditingName] = useState('');
+
+    const showAddModal = () => {
+        setIsAddModalVisible(true);
     };
 
-    const handleEditItem = (item: T, e: React.FocusEvent<HTMLInputElement>) => {
-        onEdit(item, e);
-        setEditingId(null);
-    };
-
-    const handleSelectItem = (item: T) => {
-        if (onSelect) {
-            onSelect(item);
+    const handleAddOk = () => {
+        if (newItemName.trim()) {
+            onAdd(newItemName);
         }
+        setIsAddModalVisible(false);
+        setNewItemName('');
+    };
+
+    const handleAddCancel = () => {
+        setIsAddModalVisible(false);
+        setNewItemName('');
+    };
+    
+    const showEditModal = (item: T) => {
+        setEditingItem(item);
+        setEditingName(item.name);
+        setIsEditModalVisible(true);
+    };
+    
+    const handleEditOk = () => {
+        if (editingItem && editingName.trim()) {
+            onEdit(editingItem, editingName);
+        }
+        setIsEditModalVisible(false);
+        setEditingItem(null);
+        setEditingName('');
+    };
+
+    const handleEditCancel = () => {
+        setIsEditModalVisible(false);
+        setEditingItem(null);
+        setEditingName('');
     };
 
     return (
         <div>
+            <div style={{ marginBottom: '10px', textAlign: 'right' }}>
+                <Button onClick={showAddModal} type="primary" size="small">
+                    Add
+                </Button>
+            </div>
             <List
                 size="small"
-                header={
-                    <Row justify="space-between" align="middle">
-                        <Col flex="auto">
-                            {isAdding && (
-                                <Input
-                                    onBlur={handleAddItem}
-                                    onPressEnter={(e) => (e.target as HTMLInputElement).blur()}
-                                    placeholder="Enter new item name"
-                                    autoFocus
-                                />
-                            )}
-                        </Col>
-                        <Col>
-                            <Button onClick={() => setIsAdding(!isAdding)} type="primary" size="small">
-                                {isAdding ? 'Cancel' : 'Add'}
-                            </Button>
-                        </Col>
-                    </Row>
-                }
                 bordered
                 dataSource={dataList}
                 renderItem={(item) => (
@@ -66,28 +78,43 @@ const EditList = <T extends DataItem>({ dataList, onAdd, onEdit, onDelete, onSel
                             backgroundColor: selectedId === item.id ? '#e6f7ff' : 'transparent',
                             cursor: 'pointer'
                         }}
-                        onClick={() => handleSelectItem(item)}
+                        onClick={() => onSelect && onSelect(item)}
                         actions={[
-                            <Button type="link" size="small" onClick={(e) => { e.stopPropagation(); setEditingId(item.id); }}>Edit</Button>,
+                            <Button type="link" size="small" onClick={(e) => { e.stopPropagation(); showEditModal(item); }}>Edit</Button>,
                             <Button type="link" size="small" danger onClick={(e) => { e.stopPropagation(); onDelete(item); }}>Delete</Button>,
                         ]}
                     >
-                        {editingId === item.id ? (
-                            <Input
-                                defaultValue={item.name}
-                                onBlur={(e) => handleEditItem(item, e)}
-                                onPressEnter={(e) => (e.target as HTMLInputElement).blur()}
-                                onClick={(e) => e.stopPropagation()}
-                                autoFocus
-                            />
-                        ) : (
-                            <div style={{ width: '100%', padding: '4px 0' }}>
-                                {item.name}
-                            </div>
-                        )}
+                        {item.name}
                     </List.Item>
                 )}
             />
+            <Modal
+                title="Add New Item"
+                open={isAddModalVisible}
+                onOk={handleAddOk}
+                onCancel={handleAddCancel}
+                destroyOnClose
+            >
+                <Input
+                    placeholder="Enter new item name"
+                    value={newItemName}
+                    onChange={(e) => setNewItemName(e.target.value)}
+                    onPressEnter={handleAddOk}
+                />
+            </Modal>
+            <Modal
+                title="Edit Item"
+                open={isEditModalVisible}
+                onOk={handleEditOk}
+                onCancel={handleEditCancel}
+                destroyOnClose
+            >
+                <Input
+                    value={editingName}
+                    onChange={(e) => setEditingName(e.target.value)}
+                    onPressEnter={handleEditOk}
+                />
+            </Modal>
         </div>
     );
 };

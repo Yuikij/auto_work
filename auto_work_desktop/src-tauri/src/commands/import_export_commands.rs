@@ -82,11 +82,10 @@ pub async fn import_all_data(db: tauri::State<'_, SqlitePool>, data_json: String
         sqlx::query(
             r#"
             INSERT INTO data_cell (
-                id, name, source_id, row_index, column_index, sheet_name, 
-                start_row, end_row, start_col, end_col, data_type, data_range, 
-                description, sheet, select_index, script, start_index, end_index, 
-                res, template_id, specific_value, param_name, type, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                id, name, source_id, row_index, column_index, sheet, 
+                select_index, script, start_index, end_index, res, 
+                template_id, specific_value, param_name, type, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             "#
         )
         .bind(dc.id)
@@ -94,14 +93,6 @@ pub async fn import_all_data(db: tauri::State<'_, SqlitePool>, data_json: String
         .bind(dc.source_id)
         .bind(dc.row_index)
         .bind(dc.column_index)
-        .bind(dc.sheet_name)
-        .bind(dc.start_row)
-        .bind(dc.end_row)
-        .bind(dc.start_col)
-        .bind(dc.end_col)
-        .bind(dc.data_type)
-        .bind(dc.data_range)
-        .bind(dc.description)
         .bind(dc.sheet)
         .bind(dc.select_index)
         .bind(dc.script)

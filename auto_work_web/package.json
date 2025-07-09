@@ -20,8 +20,6 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "build-offline": "react-scripts build && npm run copy-to-backend",
-    "copy-to-backend": "cp -r build/* ../soukon-auto-work/src/main/resources/static/",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

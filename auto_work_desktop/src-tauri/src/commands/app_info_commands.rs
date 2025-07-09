@@ -22,7 +22,7 @@ pub async fn get_app_info() -> Result<AppInfo, String> {
 }
 
 #[tauri::command]
-pub async fn create_backup(pool: State<'_, SqlitePool>) -> Result<String, String> {
+pub async fn create_backup(_pool: State<'_, SqlitePool>) -> Result<String, String> {
     use std::fs;
     use std::path::Path;
     use chrono::Local;
