@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import { List, Button, Upload, message, Modal, Row, Col, Typography, Card } from 'antd';
-import { UploadOutlined, DeleteOutlined } from '@ant-design/icons';
-import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
+import { List, Button, message, Modal, Row, Col, Typography, Card, Input } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 
 const { Text } = Typography;
 
@@ -18,8 +17,8 @@ interface FileListProps {
 
 const FileList: React.FC<FileListProps> = ({ templateId }) => {
     const [files, setFiles] = useState<AppFile[]>([]);
-    const [uploading, setUploading] = useState(false);
-    const [fileList, setFileList] = useState<UploadFile[]>([]);
+    const [newFileName, setNewFileName] = useState('');
+    const [loading, setLoading] = useState(false);
 
 
     const fetchFiles = async () => {
@@ -60,81 +59,53 @@ const FileList: React.FC<FileListProps> = ({ templateId }) => {
         });
     };
 
-    const handleUpload = async () => {
-        if (fileList.length === 0 || !templateId) return;
+    const handleAddFile = async () => {
+        if (!newFileName.trim() || !templateId) return;
 
-        const file = fileList[0];
-        if (!file.originFileObj) {
-            message.error("Could not find the file object to upload.");
-            return;
+        setLoading(true);
+        try {
+            await invoke('add_file', {
+                templateId: templateId,
+                name: newFileName,
+                path: newFileName, // Using name as path, as per new logic
+            });
+            message.success('File added successfully!');
+            setNewFileName('');
+            fetchFiles();
+        } catch (error) {
+            console.error('Error adding file:', error);
+            message.error(`Failed to add file: ${error}`);
+        } finally {
+            setLoading(false);
         }
-
-        setUploading(true);
-
-        const reader = new FileReader();
-        reader.onload = async (e: ProgressEvent<FileReader>) => {
-            if (e.target?.result) {
-                try {
-                    const content = Array.from(new Uint8Array(e.target.result as ArrayBuffer));
-                    await invoke('upload_file_to_template', {
-                        templateId: templateId,
-                        name: file.name,
-                        content: content
-                    });
-                    message.success('File uploaded successfully!');
-                    setFileList([]);
-                    fetchFiles(); // Refresh the list
-                } catch (error) {
-                    console.error('Error uploading file:', error);
-                    message.error(`Failed to upload file: ${error}`);
-                } finally {
-                    setUploading(false);
-                }
-            }
-        };
-        reader.onerror = () => {
-            message.error("Failed to read the file.");
-            setUploading(false);
-        }
-        reader.readAsArrayBuffer(file.originFileObj);
     };
 
-    const uploadProps: UploadProps = {
-        onRemove: file => {
-            const index = fileList.indexOf(file);
-            const newFileList = fileList.slice();
-            newFileList.splice(index, 1);
-            setFileList(newFileList);
-        },
-        beforeUpload: file => {
-            setFileList([file]);
-            return false; // Prevent auto-upload
-        },
-        fileList,
-        maxCount: 1,
-    };
 
     return (
-        <Card title="文件列表详情" style={{ margin: '16px' }}>
-            <Row gutter={16} style={{ marginBottom: 16 }}>
-                <Col>
-                    <Upload {...uploadProps}>
-                        <Button icon={<UploadOutlined />}>Select File</Button>
-                    </Upload>
+        <Card title="文件列表" style={{ margin: '16px' }}>
+            <Row gutter={8} style={{ marginBottom: 16 }}>
+                <Col flex="auto">
+                    <Input
+                        placeholder="输入文件名"
+                        value={newFileName}
+                        onChange={(e) => setNewFileName(e.target.value)}
+                        onPressEnter={handleAddFile}
+                    />
                 </Col>
                 <Col>
                     <Button
                         type="primary"
-                        onClick={handleUpload}
-                        disabled={fileList.length === 0}
-                        loading={uploading}
+                        onClick={handleAddFile}
+                        disabled={!newFileName.trim()}
+                        loading={loading}
                     >
-                        {uploading ? 'Uploading' : 'Start Upload'}
+                        添加
                     </Button>
                 </Col>
             </Row>
 
             <List
+                size="small"
                 bordered
                 dataSource={files}
                 renderItem={(file) => (

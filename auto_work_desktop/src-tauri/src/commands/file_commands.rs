@@ -1,5 +1,5 @@
-use tauri::{AppHandle, State, Manager};
-use sqlx::{SqlitePool};
+use tauri::State;
+use sqlx::SqlitePool;
 use crate::models::{DataCell, Files};
 use serde::{Deserialize, Serialize};
 use scraper::{Html, Selector};
@@ -24,56 +24,6 @@ fn excel_col_to_index(col_str: &str) -> Option<u32> {
 pub struct ParseResult {
     pub values: Vec<f64>,
 }
-
-#[tauri::command]
-pub async fn upload_file_to_template(
-    app_handle: AppHandle,
-    pool: State<'_, SqlitePool>,
-    template_id: i64,
-    name: String,
-    content: Vec<u8>,
-) -> Result<Files, String> {
-    // Save file to app data directory
-    let app_data_dir = app_handle
-        .path()
-        .app_data_dir()
-        .map_err(|e| e.to_string())?;
-
-    let file_path = app_data_dir.join("uploads").join(&name);
-
-    // Ensure directory exists
-    if let Some(parent) = file_path.parent() {
-        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
-    }
-
-    // Write file content
-    std::fs::write(&file_path, &content).map_err(|e| e.to_string())?;
-
-    // Insert file record into database
-    let result = sqlx::query(
-        "INSERT INTO files (name, path, template_id) VALUES (?, ?, ?)"
-    )
-    .bind(&name)
-    .bind(file_path.to_string_lossy().to_string())
-    .bind(template_id)
-    .execute(&*pool)
-    .await
-    .map_err(|e| e.to_string())?;
-
-    let file_id = result.last_insert_rowid();
-
-    let new_file = Files {
-        id: file_id,
-        name: name,
-        path: Some(file_path.to_string_lossy().to_string()),
-        template_id: template_id,
-        created_at: None, // This will be set by the database
-        updated_at: None, // This will be set by the database
-    };
-    
-    Ok(new_file)
-}
-
 
 #[tauri::command]
 pub async fn parse_data_cell(
@@ -200,7 +150,8 @@ fn parse_html_content(content: &[u8], data_cell: &DataCell) -> Result<Vec<f64>, 
          if selector_str.starts_with(".") || selector_str.starts_with("#") || selector_str.contains("[") {
             if let Ok(custom_selector) = Selector::parse(selector_str) {
                 for element in document.select(&custom_selector) {
-                    let text = element.text().collect::<String>().trim().to_string();
+                    let collected_text: String = element.text().collect();
+                    let text = collected_text.trim().to_string();
                     if let Ok(value) = text.parse::<f64>() {
                         values.push(value);
                     }
@@ -224,7 +175,8 @@ fn parse_html_content(content: &[u8], data_cell: &DataCell) -> Result<Vec<f64>, 
             if let Some(target_col) = excel_col_to_index(col_str) {
                 if row_index == (target_row - 1) as usize {
                     if let Some(cell) = cells.get(target_col as usize) {
-                        let text = cell.text().collect::<String>().trim().to_string();
+                        let collected_text: String = cell.text().collect();
+                        let text = collected_text.trim().to_string();
                         if let Ok(value) = text.parse::<f64>() {
                             values.push(value);
                         }
@@ -243,7 +195,8 @@ fn parse_html_content(content: &[u8], data_cell: &DataCell) -> Result<Vec<f64>, 
                 
                 if row_index >= start_row as usize && row_index < end_row as usize {
                     if let Some(cell) = cells.get(target_col as usize) {
-                        let text = cell.text().collect::<String>().trim().to_string();
+                        let collected_text: String = cell.text().collect();
+                        let text = collected_text.trim().to_string();
                         if let Ok(value) = text.parse::<f64>() {
                             values.push(value);
                         }
@@ -261,7 +214,8 @@ fn parse_html_content(content: &[u8], data_cell: &DataCell) -> Result<Vec<f64>, 
                 
                 for col_index in start_col as usize..end_col.min(cells.len() as i32) as usize {
                     if let Some(cell) = cells.get(col_index) {
-                        let text = cell.text().collect::<String>().trim().to_string();
+                        let collected_text: String = cell.text().collect();
+                        let text = collected_text.trim().to_string();
                         if let Ok(value) = text.parse::<f64>() {
                             values.push(value);
                         }
@@ -274,6 +228,7 @@ fn parse_html_content(content: &[u8], data_cell: &DataCell) -> Result<Vec<f64>, 
 
     Ok(values)
 }
+
 
 #[allow(dead_code, unused_variables)]
 fn cell_to_f64(cell: &dyn std::fmt::Debug) -> Option<f64> {

@@ -128,18 +128,4 @@ pub async fn get_data_cell(
     .fetch_one(&*pool)
     .await
     .map_err(|e| e.to_string())
-}
-
-#[tauri::command]
-pub async fn get_data_cells(
-    pool: State<'_, SqlitePool>,
-    template_id: i64,
-) -> Result<Vec<DataCell>, String> {
-     sqlx::query_as::<_, DataCell>(
-        "SELECT * FROM data_cell WHERE template_id = ?"
-    )
-    .bind(template_id)
-    .fetch_all(&*pool)
-    .await
-    .map_err(|e| e.to_string())
 } 

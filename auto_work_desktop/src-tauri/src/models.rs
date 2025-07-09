@@ -31,6 +31,14 @@ pub struct DataCell {
     pub updated_at: Option<String>,
 }
 
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
+pub struct TemplateParam {
+    pub id: i64,
+    pub template_id: i64,
+    pub key: String,
+    pub value: Option<String>,
+}
+
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow, Clone)]
 pub struct Files {
     pub id: i64,
