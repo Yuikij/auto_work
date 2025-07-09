@@ -2,26 +2,24 @@ import React, { useState } from 'react';
 import { Input, Button, List, Space } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 
-interface KVPair {
+export interface Param {
+    id: number;
     key: string;
-    value: string;
 }
 
-interface KVAddProps {
-    kvPairs: KVPair[];
-    onAdd: (newPair: KVPair) => void;
+interface ParamManagerProps {
+    params: Param[];
+    onAdd: (key: string) => void;
     onDelete: (key: string) => void;
 }
 
-const KVAdd: React.FC<KVAddProps> = ({ kvPairs, onAdd, onDelete }) => {
+const ParamManager: React.FC<ParamManagerProps> = ({ params, onAdd, onDelete }) => {
     const [key, setKey] = useState('');
-    const [value, setValue] = useState('');
 
     const handleAdd = () => {
-        if (key && value) {
-            onAdd({ key, value });
+        if (key) {
+            onAdd(key);
             setKey('');
-            setValue('');
         }
     };
 
@@ -29,23 +27,19 @@ const KVAdd: React.FC<KVAddProps> = ({ kvPairs, onAdd, onDelete }) => {
         <div>
             <Space>
                 <Input
-                    placeholder="Key"
+                    placeholder="参数名 (例如: 年份)"
                     value={key}
                     onChange={(e) => setKey(e.target.value)}
-                />
-                <Input
-                    placeholder="Value"
-                    value={value}
-                    onChange={(e) => setValue(e.target.value)}
+                    onPressEnter={handleAdd}
                 />
                 <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-                    Add
+                    添加
                 </Button>
             </Space>
             <List
                 style={{ marginTop: 16 }}
                 bordered
-                dataSource={kvPairs}
+                dataSource={params}
                 renderItem={(item) => (
                     <List.Item
                         actions={[
@@ -57,7 +51,7 @@ const KVAdd: React.FC<KVAddProps> = ({ kvPairs, onAdd, onDelete }) => {
                             />,
                         ]}
                     >
-                        <List.Item.Meta title={item.key} description={item.value} />
+                        {item.key}
                     </List.Item>
                 )}
             />
@@ -65,4 +59,4 @@ const KVAdd: React.FC<KVAddProps> = ({ kvPairs, onAdd, onDelete }) => {
     );
 };
 
-export default KVAdd;
+export default ParamManager;

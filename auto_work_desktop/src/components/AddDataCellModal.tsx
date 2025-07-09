@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Select, Switch, Button } from 'antd';
 import FormulaBuilder from './FormulaBuilder';
+import { Param } from './KVAdd';
 
 const { Option } = Select;
 
@@ -20,10 +21,11 @@ interface AddDataCellModalProps {
     onOk: (values: any) => void;
     files: File[];
     dataCells: DataCell[];
+    params: Param[]; // Add params prop
     initialValues?: Partial<DataCell>;
 }
 
-const AddDataCellModal: React.FC<AddDataCellModalProps> = ({ open, onCancel, onOk, files, dataCells, initialValues }) => {
+const AddDataCellModal: React.FC<AddDataCellModalProps> = ({ open, onCancel, onOk, files, dataCells, params, initialValues }) => {
     const [form] = Form.useForm();
     const [selectedType, setSelectedType] = useState(1);
 
@@ -123,9 +125,9 @@ const AddDataCellModal: React.FC<AddDataCellModalProps> = ({ open, onCancel, onO
                 );
             case 4: // 参数
                 return (
-                    <Form.Item name="param_name" label="选择参数" rules={[{ required: true }]}>
-                        <Select placeholder="请选择参数">
-                            {/* Parameter options will be added later */}
+                    <Form.Item name="param_name" label="选择参数">
+                        <Select placeholder="请选择一个已定义的参数">
+                            {params.map(p => <Option key={p.key} value={p.key}>{p.key}</Option>)}
                         </Select>
                     </Form.Item>
                 );

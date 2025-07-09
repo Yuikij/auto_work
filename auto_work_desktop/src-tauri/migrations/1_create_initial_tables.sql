@@ -38,4 +38,13 @@ CREATE TABLE IF NOT EXISTS data_cell (
     FOREIGN KEY (template_id) REFERENCES templates (id),
     FOREIGN KEY (source_id) REFERENCES files (id),
     FOREIGN KEY (source_cell_id) REFERENCES data_cell (id)
+);
+
+CREATE TABLE IF NOT EXISTS template_params (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    template_id INTEGER NOT NULL,
+    key TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (template_id) REFERENCES templates(id)
 ); 

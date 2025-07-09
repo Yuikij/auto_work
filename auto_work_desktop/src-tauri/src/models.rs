@@ -42,7 +42,8 @@ pub struct TemplateParam {
     pub id: i64,
     pub template_id: i64,
     pub key: String,
-    pub value: Option<String>,
+    pub created_at: Option<String>,
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow, Clone)]

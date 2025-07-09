@@ -475,12 +475,10 @@ pub async fn add_param(
     pool: State<'_, SqlitePool>,
     template_id: i64,
     key: String,
-    value: String,
 ) -> Result<(), String> {
-    sqlx::query("INSERT INTO template_params (template_id, key, value) VALUES (?, ?, ?)")
+    sqlx::query("INSERT INTO template_params (template_id, key) VALUES (?, ?)")
         .bind(template_id)
         .bind(key)
-        .bind(value)
         .execute(&*pool)
         .await
         .map(|_| ())

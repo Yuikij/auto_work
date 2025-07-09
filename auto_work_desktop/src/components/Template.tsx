@@ -3,7 +3,7 @@ import { Button, Card, Col, Divider, message, Modal, Row, Space, Switch, Table, 
 import { DeleteOutlined, PlusOutlined, UploadOutlined, FileTextOutlined } from "@ant-design/icons";
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
 import { invoke } from "@tauri-apps/api/core";
-import KVAdd from "./KVAdd";
+import ParamManager, { Param } from "./KVAdd";
 import AddDataCellModal from './AddDataCellModal';
 
 interface DataCell {
@@ -40,7 +40,7 @@ const dataTypeMap: { [key: number]: string } = {
 };
 
 const Template: React.FC<TemplateProps> = ({ templateId }) => {
-  const [params, setParams] = useState<KVPair[]>([]);
+  const [params, setParams] = useState<Param[]>([]);
   const [sourceFiles, setSourceFiles] = useState<FileData[]>([]);
   const [newFileName, setNewFileName] = useState('');
   const [dataCells, setDataCells] = useState<DataCell[]>([]);
@@ -98,12 +98,36 @@ const Template: React.FC<TemplateProps> = ({ templateId }) => {
   const getParams = async () => {
     if (!templateId) return;
     try {
-      const kvPairs = await invoke<KVPair[]>('get_params', { templateId });
-      setParams(kvPairs);
+      const fetchedParams = await invoke<Param[]>('get_params', { templateId });
+      setParams(fetchedParams);
     } catch (error) {
       console.error('Error fetching params:', error);
       message.error('Failed to fetch params');
     }
+  };
+
+  const handleAddParam = async (key: string) => {
+    if (!templateId || !key.trim()) return;
+    try {
+        await invoke('add_param', { templateId, key });
+        message.success(`参数 '${key}' 添加成功`);
+        getParams();
+    } catch (error) {
+        console.error('Failed to add param:', error);
+        message.error(`添加参数失败: ${error}`);
+    }
+  };
+
+  const handleDeleteParam = async (key: string) => {
+      if (!templateId) return;
+      try {
+          await invoke('delete_param', { templateId, key });
+          message.success(`参数 '${key}' 已删除`);
+          getParams();
+      } catch (error) {
+          console.error('Failed to delete param:', error);
+          message.error(`删除参数失败: ${error}`);
+      }
   };
 
   const getDataCell = async () => {
@@ -274,25 +298,16 @@ const Template: React.FC<TemplateProps> = ({ templateId }) => {
   ];
 
   return (
-    <div>
+    <div style={{ padding: '20px', background: '#f0f2f5' }}>
       <Row gutter={16}>
-        <Col span={12}>
+        <Col span={24}>
           <Card title="参数定义">
-            <KVAdd
-              kvPairs={params}
-              onAdd={async (newPair: KVPair) => {
-                if (!templateId) return;
-                await invoke("add_param", { templateId, key: newPair.key, value: newPair.value });
-                getParams();
-              }}
-              onDelete={async (key: string) => {
-                if (!templateId) return;
-                await invoke("delete_param", { templateId, key });
-                getParams();
-              }}
-            />
+            <ParamManager params={params} onAdd={handleAddParam} onDelete={handleDeleteParam} />
           </Card>
         </Col>
+      </Row>
+      <Divider />
+      <Row gutter={16}>
         <Col span={12}>
           <Card title="结果计算">
             <Space.Compact style={{ width: '100%' }}>
@@ -353,37 +368,36 @@ const Template: React.FC<TemplateProps> = ({ templateId }) => {
             <Button type="primary" onClick={start} style={{ marginTop: 16 }} block loading={uploading}>开始运行</Button>
           </Card>
         </Col>
+        <Col span={12}>
+          <Card title="模板数据集" extra={<Button onClick={showAddDataCellModal} icon={<PlusOutlined />}>添加数据</Button>}>
+            <Table columns={dataColumns} dataSource={dataCells} rowKey="id" />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card title="Data Value" extra={<Button onClick={() => setDataValueOpen(true)} icon={<FileTextOutlined />}>查看</Button>}>
+            <pre>{JSON.stringify(dataValue, null, 2)}</pre>
+          </Card>
+        </Col>
       </Row>
-
-      <Divider />
-
-      <Card 
-        title="模板数据集"
-        extra={<Button type="primary" onClick={showAddDataCellModal}>添加数据</Button>}
-      >
-        <Table rowKey="id" columns={dataColumns} dataSource={dataCells} />
-      </Card>
-
       <AddDataCellModal
         open={isModalOpen}
-        onOk={handleAddDataCell}
         onCancel={() => {
             setIsModalOpen(false);
             setEditingCell(null);
         }}
+        onOk={handleAddDataCell}
         files={sourceFiles}
         dataCells={dataCells}
-        initialValues={editingCell || undefined}
+        params={params} // Pass params here
+        initialValues={editingCell ? { ...editingCell, type: editingCell.type } : undefined}
       />
-
-       <Modal
-          title="Data Value"
-          open={dataValueOpen}
-          onOk={() => setDataValueOpen(false)}
-          onCancel={() => setDataValueOpen(false)}
-        >
-          <pre>{JSON.stringify(dataValue, null, 2)}</pre>
-        </Modal>
+      <Modal title="数据显示" open={dataValueOpen} onOk={() => setDataValueOpen(false)} onCancel={() => setDataValueOpen(false)}>
+        <List
+            bordered
+            dataSource={dataValue}
+            renderItem={item => <List.Item>{item}</List.Item>}
+        />
+      </Modal>
     </div>
   );
 };

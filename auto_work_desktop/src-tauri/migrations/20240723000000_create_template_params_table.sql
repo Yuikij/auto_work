@@ -1,9 +1,0 @@
-CREATE TABLE IF NOT EXISTS template_params (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    template_id INTEGER NOT NULL,
-    key TEXT NOT NULL,
-    value TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (template_id) REFERENCES templates(id) ON DELETE CASCADE
-); 
