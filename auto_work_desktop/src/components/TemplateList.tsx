@@ -33,7 +33,6 @@ const TemplateList: React.FC<TemplateListProps> = ({ type, onSelect, selectedId 
         getTemplates();
     }, [type]);
 
-
     const deleteTemplate = async (item: Template) => {
         try {
             await invoke('delete_template', { id: item.id });
@@ -94,7 +93,20 @@ const TemplateList: React.FC<TemplateListProps> = ({ type, onSelect, selectedId 
     }
 
     return (
-        <Card title="模板列表" style={{ margin: '16px' }}>
+        <Card 
+            title={
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '16px' }}>📋</span>
+                    <span className="text-gradient">模板列表</span>
+                </div>
+            }
+            className="modern-card hover-lift"
+            style={{ 
+                margin: '16px',
+                border: 'none'
+            }}
+            bodyStyle={{ padding: '16px' }}
+        >
             <EditList 
                 dataList={data} 
                 onEdit={editTemplate} 

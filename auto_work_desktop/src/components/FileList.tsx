@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/core';
-import { List, Button, message, Modal, Row, Col, Typography, Card, Input } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
+import { List, Button, message, Modal, Row, Col, Typography, Card, Input, Space } from 'antd';
+import { DeleteOutlined, PlusOutlined, FileTextOutlined } from '@ant-design/icons';
 
 const { Text } = Typography;
 
@@ -19,7 +19,6 @@ const FileList: React.FC<FileListProps> = ({ templateId }) => {
     const [files, setFiles] = useState<AppFile[]>([]);
     const [newFileName, setNewFileName] = useState('');
     const [loading, setLoading] = useState(false);
-
 
     const fetchFiles = async () => {
         if (!templateId) {
@@ -41,19 +40,20 @@ const FileList: React.FC<FileListProps> = ({ templateId }) => {
 
     const handleDeleteFile = (fileId: number) => {
         Modal.confirm({
-            title: 'Are you sure you want to delete this file?',
-            content: 'This action cannot be undone.',
-            okText: 'Yes, Delete',
+            title: '确认删除',
+            content: '确定要删除这个文件吗？此操作无法撤销。',
+            okText: '删除',
             okType: 'danger',
-            cancelText: 'No',
+            cancelText: '取消',
+            className: 'modern-modal',
             onOk: async () => {
                 try {
                     await invoke('delete_file', { fileId });
-                    message.success('File deleted successfully!');
+                    message.success('文件删除成功！');
                     fetchFiles(); // Refresh the list
                 } catch (error) {
                     console.error("Error deleting file:", error);
-                    message.error(`Failed to delete file: ${error}`);
+                    message.error(`删除文件失败: ${error}`);
                 }
             },
         });
@@ -69,60 +69,98 @@ const FileList: React.FC<FileListProps> = ({ templateId }) => {
                 name: newFileName,
                 path: newFileName, // Using name as path, as per new logic
             });
-            message.success('File added successfully!');
+            message.success('文件添加成功！');
             setNewFileName('');
             fetchFiles();
         } catch (error) {
             console.error('Error adding file:', error);
-            message.error(`Failed to add file: ${error}`);
+            message.error(`添加文件失败: ${error}`);
         } finally {
             setLoading(false);
         }
     };
 
-
     return (
-        <Card title="文件列表" style={{ margin: '16px' }}>
-            <Row gutter={8} style={{ marginBottom: 16 }}>
-                <Col flex="auto">
-                    <Input
-                        placeholder="输入文件名"
-                        value={newFileName}
-                        onChange={(e) => setNewFileName(e.target.value)}
-                        onPressEnter={handleAddFile}
-                    />
-                </Col>
-                <Col>
-                    <Button
-                        type="primary"
-                        onClick={handleAddFile}
-                        disabled={!newFileName.trim()}
-                        loading={loading}
-                    >
-                        添加
-                    </Button>
-                </Col>
-            </Row>
+        <Card 
+            title={
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '16px' }}>📁</span>
+                    <span className="text-gradient">文件列表</span>
+                </div>
+            }
+            className="modern-card hover-lift"
+            style={{ 
+                margin: '16px',
+                border: 'none'
+            }}
+            bodyStyle={{ padding: '16px' }}
+        >
+            <Space direction="vertical" style={{ width: '100%' }} size="middle">
+                <Row gutter={8}>
+                    <Col flex="auto">
+                        <Input
+                            placeholder="输入文件名"
+                            value={newFileName}
+                            onChange={(e) => setNewFileName(e.target.value)}
+                            onPressEnter={handleAddFile}
+                            className="modern-input"
+                            style={{ borderRadius: '8px' }}
+                        />
+                    </Col>
+                    <Col>
+                        <Button
+                            type="primary"
+                            onClick={handleAddFile}
+                            disabled={!newFileName.trim()}
+                            loading={loading}
+                            icon={<PlusOutlined />}
+                            className="modern-button primary"
+                            style={{ borderRadius: '8px' }}
+                        >
+                            添加
+                        </Button>
+                    </Col>
+                </Row>
 
-            <List
-                size="small"
-                bordered
-                dataSource={files}
-                renderItem={(file) => (
-                    <List.Item
-                        actions={[
-                            <Button
-                                type="text"
-                                danger
-                                icon={<DeleteOutlined />}
-                                onClick={() => handleDeleteFile(file.id)}
-                            />,
-                        ]}
-                    >
-                        <Text>{file.name}</Text>
-                    </List.Item>
-                )}
-            />
+                <List
+                    className="modern-list"
+                    size="small"
+                    dataSource={files}
+                    locale={{ emptyText: '暂无文件' }}
+                    renderItem={(file) => (
+                        <List.Item
+                            className="hover-lift"
+                            style={{
+                                borderRadius: '8px',
+                                marginBottom: '4px',
+                                padding: '12px 16px',
+                                background: 'var(--bg-card)',
+                                border: '1px solid var(--border-light)',
+                                transition: 'var(--transition-fast)'
+                            }}
+                            actions={[
+                                <Button
+                                    type="text"
+                                    danger
+                                    icon={<DeleteOutlined />}
+                                    onClick={() => handleDeleteFile(file.id)}
+                                    className="modern-button"
+                                    style={{ 
+                                        borderRadius: '6px',
+                                        padding: '4px 8px',
+                                        minWidth: 'auto'
+                                    }}
+                                />,
+                            ]}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <FileTextOutlined style={{ color: 'var(--text-secondary)' }} />
+                                <Text style={{ color: 'var(--text-primary)' }}>{file.name}</Text>
+                            </div>
+                        </List.Item>
+                    )}
+                />
+            </Space>
         </Card>
     );
 };

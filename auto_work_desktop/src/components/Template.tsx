@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Card, Col, Divider, message, Modal, Row, Space, Switch, Table, Input, List, Select, Upload } from "antd";
-import { DeleteOutlined, PlusOutlined, UploadOutlined, FileTextOutlined } from "@ant-design/icons";
+import { Button, Card, Col, Divider, message, Modal, Row, Space, Switch, Table, Input, List, Select, Upload, Tag, Tooltip } from "antd";
+import { DeleteOutlined, PlusOutlined, UploadOutlined, FileTextOutlined, PlayCircleOutlined, SettingOutlined, DatabaseOutlined, CalculatorOutlined, EditOutlined } from "@ant-design/icons";
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
 import { invoke } from "@tauri-apps/api/core";
 import ParamManager, { Param } from "./KVAdd";
@@ -48,7 +48,6 @@ const Template: React.FC<TemplateProps> = ({ templateId }) => {
   const [dataValue, setDataValue] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCell, setEditingCell] = useState<DataCell | null>(null);
-
 
   // New state for execution parameters
   const [executionParams, setExecutionParams] = useState<KVPair[]>([]);
@@ -275,127 +274,440 @@ const Template: React.FC<TemplateProps> = ({ templateId }) => {
     setIsModalOpen(true);
   };
 
+  const getTypeIcon = (type: number) => {
+    const iconMap: { [key: number]: React.ReactNode } = {
+      1: <FileTextOutlined style={{ color: '#52c41a' }} />,
+      2: <CalculatorOutlined style={{ color: '#1890ff' }} />,
+      3: <DatabaseOutlined style={{ color: '#722ed1' }} />,
+      4: <SettingOutlined style={{ color: '#fa8c16' }} />,
+      5: <FileTextOutlined style={{ color: '#eb2f96' }} />,
+    };
+    return iconMap[type] || <FileTextOutlined />;
+  };
+
+  const getTypeTag = (type: number) => {
+    const typeMap: { [key: number]: { text: string; color: string } } = {
+      1: { text: '文件', color: 'green' },
+      2: { text: '计算', color: 'blue' },
+      3: { text: '其他数据单元', color: 'purple' },
+      4: { text: '参数', color: 'orange' },
+      5: { text: '具体值', color: 'magenta' },
+    };
+    const config = typeMap[type] || { text: '未知', color: 'default' };
+    return <Tag color={config.color}>{config.text}</Tag>;
+  };
+
   const dataColumns = [
-    { title: '名称', dataIndex: 'name', key: 'name' },
-    { title: '类型', dataIndex: 'type', key: 'type', render: (type: number) => {
-        const typeMap: { [key: number]: string } = {
-            1: '文件',
-            2: '计算',
-            3: '其他数据单元',
-            4: '参数',
-            5: '具体值',
-        };
-        return typeMap[type] || '未知';
-    } },
-    { title: '最终结果', dataIndex: 'res', key: 'res', render: (res: boolean) => <Switch checked={res} disabled /> },
-    { title: '执行结果', dataIndex: 'specific_value', key: 'specific_value' },
-    { title: '操作', key: 'action', render: (_: any, record: DataCell) => (
-      <Space size="middle">
-        <a onClick={() => handleEditDataCell(record)}>编辑</a>
-        <a onClick={() => delTemplateData(record.id)}>删除</a>
-      </Space>
-    )},
+    { 
+      title: '名称', 
+      dataIndex: 'name', 
+      key: 'name',
+      render: (name: string, record: DataCell) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {getTypeIcon(record.type)}
+          <span style={{ fontWeight: 500 }}>{name}</span>
+        </div>
+      )
+    },
+    { 
+      title: '类型', 
+      dataIndex: 'type', 
+      key: 'type', 
+      render: (type: number) => getTypeTag(type)
+    },
+    { 
+      title: '最终结果', 
+      dataIndex: 'res', 
+      key: 'res', 
+      render: (res: boolean) => (
+        <Switch 
+          checked={res} 
+          disabled 
+          className="modern-switch"
+          size="small"
+        />
+      )
+    },
+    { 
+      title: '执行结果', 
+      dataIndex: 'specific_value', 
+      key: 'specific_value',
+      render: (value: string | null) => (
+        <div style={{ 
+          maxWidth: '200px', 
+          overflow: 'hidden', 
+          textOverflow: 'ellipsis',
+          color: value ? 'var(--text-primary)' : 'var(--text-muted)'
+        }}>
+          {value || '暂无结果'}
+        </div>
+      )
+    },
+    { 
+      title: '操作', 
+      key: 'action', 
+      render: (_: any, record: DataCell) => (
+        <Space size="small">
+          <Tooltip title="编辑">
+            <Button 
+              type="text" 
+              size="small"
+              icon={<EditOutlined />}
+              onClick={() => handleEditDataCell(record)}
+              className="modern-button"
+              style={{ borderRadius: '6px' }}
+            />
+          </Tooltip>
+          <Tooltip title="删除">
+            <Button 
+              type="text" 
+              size="small"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => delTemplateData(record.id)}
+              className="modern-button"
+              style={{ borderRadius: '6px' }}
+            />
+          </Tooltip>
+        </Space>
+      )
+    },
   ];
 
   return (
-    <div style={{ padding: '20px', background: '#f0f2f5' }}>
-      <Row gutter={16}>
-        <Col span={24}>
-          <Card title="参数定义">
+    <div className="fade-in" style={{ padding: '0' }}>
+      {/* 顶部操作区域 */}
+      <div className="execution-area-wrapper">
+        <Row gutter={[24, 24]}>
+          <Col span={24}>
+            <Card 
+              title={
+                <div className="config-card-title">
+                  <PlayCircleOutlined style={{ color: '#667eea' }} />
+                  <span className="text-gradient">模板执行</span>
+                </div>
+              }
+              className="modern-card execution-area-content"
+              bodyStyle={{ padding: '20px' }}
+            >
+              <Row gutter={[16, 16]} align="middle" className="execution-control-row">
+                              <Col span={6}>
+                  <div className="execution-control-label">
+                    <SettingOutlined style={{ color: '#667eea' }} />
+                    添加执行参数
+                  </div>
+                </Col>
+              <Col span={5}>
+                <Select
+                  style={{ width: '100%' }}
+                  placeholder="选择参数"
+                  value={currentExecParamKey || undefined}
+                  onChange={(value) => setCurrentExecParamKey(value)}
+                  className="modern-select"
+                >
+                  {params.map(p => (
+                    <Select.Option key={p.key} value={p.key}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <SettingOutlined style={{ fontSize: '12px', color: 'var(--text-secondary)' }} />
+                        {p.key}
+                      </div>
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Col>
+              <Col span={5}>
+                <Input
+                  placeholder="输入参数值"
+                  value={currentExecParamValue}
+                  onChange={(e) => setCurrentExecParamValue(e.target.value)}
+                  className="modern-input"
+                />
+              </Col>
+              <Col span={3}>
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={handleAddExecutionParam}
+                  className="modern-button primary"
+                  disabled={!currentExecParamKey || !currentExecParamValue}
+                  style={{ width: '100%' }}
+                >
+                  添加
+                </Button>
+              </Col>
+              <Col span={5}>
+                <Button 
+                  type="primary" 
+                  onClick={start} 
+                  loading={uploading}
+                  icon={<PlayCircleOutlined />}
+                  className="modern-button primary execute-button"
+                  style={{ 
+                    borderRadius: '12px',
+                    height: '40px',
+                    fontSize: '14px',
+                    fontWeight: 600,
+                    width: '100%',
+                    background: uploading ? 'var(--warning-gradient)' : 'var(--primary-gradient)',
+                    border: 'none',
+                    boxShadow: uploading ? 'var(--shadow-lg)' : 'var(--shadow-md)'
+                  }}
+                  disabled={executionParams.length === 0 && transientFiles.length === 0}
+                >
+                  {uploading ? '执行中...' : '开始运行'}
+                </Button>
+              </Col>
+                          </Row>
+            </Card>
+          </Col>
+        </Row>
+      </div>
+
+      {/* 中部配置区域 */}
+      <Row gutter={[24, 24]} style={{ marginBottom: '24px' }} className="template-config-row">
+        {/* 参数定义 */}
+        <Col span={8}>
+                     <Card 
+             title={
+               <div className="config-card-title">
+                 <SettingOutlined style={{ color: '#667eea' }} />
+                 <span className="text-gradient">参数定义</span>
+               </div>
+             }
+             className="modern-card hover-lift"
+             style={{ height: '400px' }}
+             bodyStyle={{ padding: '20px', height: 'calc(100% - 57px)', overflow: 'hidden' }}
+          >
             <ParamManager params={params} onAdd={handleAddParam} onDelete={handleDeleteParam} />
           </Card>
         </Col>
-      </Row>
-      <Divider />
-      <Row gutter={16}>
-        <Col span={12}>
-          <Card title="结果计算">
-            <Space.Compact style={{ width: '100%' }}>
-                <Select
-                    style={{ width: '40%' }}
-                    placeholder="选择参数"
-                    value={currentExecParamKey || undefined}
-                    onChange={(value) => setCurrentExecParamKey(value)}
-                >
-                    {params.map(p => <Select.Option key={p.key} value={p.key}>{p.key}</Select.Option>)}
-                </Select>
-                <Input
-                    style={{ width: '40%' }}
-                    placeholder="输入参数值"
-                    value={currentExecParamValue}
-                    onChange={(e) => setCurrentExecParamValue(e.target.value)}
-                />
-                <Button
-                    style={{ width: '20%' }}
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={handleAddExecutionParam}
-                >
-                    添加
-                </Button>
-            </Space.Compact>
-            <List
-                style={{ marginTop: 16 }}
-                size="small"
-                bordered
-                dataSource={executionParams}
-                renderItem={(item) => (
+
+        {/* 执行参数列表 */}
+        <Col span={8}>
+                     <Card 
+             title={
+               <div className="config-card-title">
+                 <DatabaseOutlined style={{ color: '#667eea' }} />
+                 <span className="text-gradient">执行参数</span>
+                 <Tag color="blue" className="config-card-counter">
+                   {executionParams.length} 个
+                 </Tag>
+               </div>
+             }
+             className="modern-card hover-lift"
+             style={{ height: '400px' }}
+             bodyStyle={{ padding: '20px', height: 'calc(100% - 57px)', overflow: 'hidden' }}
+          >
+            {executionParams.length === 0 ? (
+              <div className="empty-state empty-state-centered">
+                <SettingOutlined className="empty-state-icon" />
+                <div className="empty-state-title">暂无执行参数</div>
+                <div className="empty-state-description">
+                  请在上方添加执行所需的参数
+                </div>
+              </div>
+            ) : (
+              <div style={{ height: '100%', overflow: 'auto' }} className="param-list-container">
+                <List
+                  className="modern-list"
+                  size="small"
+                  dataSource={executionParams}
+                  renderItem={(item) => (
                     <List.Item
-                        actions={[
-                            <Button
-                                type="text"
-                                danger
-                                icon={<DeleteOutlined />}
-                                onClick={() => handleDeleteExecutionParam(item.key)}
-                            />,
-                        ]}
+                      className="param-list-item"
+                      actions={[
+                        <Tooltip title="删除参数">
+                          <Button
+                            type="text"
+                            danger
+                            size="small"
+                            icon={<DeleteOutlined />}
+                            onClick={() => handleDeleteExecutionParam(item.key)}
+                            className="modern-button"
+                            style={{ borderRadius: '6px' }}
+                          />
+                        </Tooltip>,
+                      ]}
                     >
-                        <List.Item.Meta title={item.key} description={item.value} />
+                      <List.Item.Meta 
+                        avatar={<SettingOutlined style={{ color: '#667eea' }} />}
+                        title={<span className="param-meta-title">{item.key}</span>}
+                        description={<span className="param-meta-description">{item.value}</span>}
+                      />
                     </List.Item>
-                )}
-                locale={{ emptyText: 'No Data' }}
-            />
-            <Upload
+                  )}
+                />
+              </div>
+            )}
+          </Card>
+        </Col>
+
+        {/* 文件上传 */}
+        <Col span={8}>
+                     <Card 
+             title={
+               <div className="config-card-title">
+                 <UploadOutlined style={{ color: '#667eea' }} />
+                 <span className="text-gradient">文件上传</span>
+                 <Tag color="orange" className="config-card-counter">
+                   {transientFiles.length} 个
+                 </Tag>
+               </div>
+             }
+             className="modern-card hover-lift"
+             style={{ height: '400px' }}
+             bodyStyle={{ padding: '20px', height: 'calc(100% - 57px)', display: 'flex', flexDirection: 'column' }}
+          >
+            <div style={{ marginBottom: '16px' }}>
+              <Upload
                 beforeUpload={handleBatchUpload}
                 onRemove={handleRemoveTransientFile}
                 multiple
                 fileList={transientFiles}
-            >
-                <Button icon={<UploadOutlined />} style={{ marginTop: 16 }}>
-                    选择文件
+                className="modern-upload"
+                showUploadList={false}
+              >
+                <Button 
+                  icon={<UploadOutlined />} 
+                  className="modern-button secondary"
+                  style={{ borderRadius: '8px', width: '100%', height: '44px' }}
+                >
+                  选择文件
                 </Button>
-            </Upload>
-            <Button type="primary" onClick={start} style={{ marginTop: 16 }} block loading={uploading}>开始运行</Button>
-          </Card>
-        </Col>
-        <Col span={12}>
-          <Card title="模板数据集" extra={<Button onClick={showAddDataCellModal} icon={<PlusOutlined />}>添加数据</Button>}>
-            <Table columns={dataColumns} dataSource={dataCells} rowKey="id" />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card title="Data Value" extra={<Button onClick={() => setDataValueOpen(true)} icon={<FileTextOutlined />}>查看</Button>}>
-            <pre>{JSON.stringify(dataValue, null, 2)}</pre>
+              </Upload>
+            </div>
+            
+                         <div style={{ flex: 1, overflow: 'auto' }} className="file-list-container">
+               {transientFiles.length === 0 ? (
+                 <div className="empty-state empty-state-centered">
+                   <UploadOutlined className="empty-state-icon" />
+                   <div className="empty-state-title">暂无上传文件</div>
+                   <div className="empty-state-description">
+                     点击上方按钮选择文件
+                   </div>
+                 </div>
+               ) : (
+                 <List
+                   className="modern-list"
+                   size="small"
+                   dataSource={transientFiles}
+                   renderItem={(file) => (
+                     <List.Item
+                       className="file-list-item"
+                      actions={[
+                        <Tooltip title="删除文件">
+                          <Button
+                            type="text"
+                            danger
+                            size="small"
+                            icon={<DeleteOutlined />}
+                            onClick={() => handleRemoveTransientFile(file)}
+                            className="modern-button"
+                            style={{ borderRadius: '6px' }}
+                          />
+                        </Tooltip>,
+                      ]}
+                    >
+                                             <List.Item.Meta 
+                         avatar={<FileTextOutlined style={{ color: '#667eea' }} />}
+                         title={<span className="file-meta-title">{file.name}</span>}
+                         description={<span className="file-meta-description">{((file.size || 0) / 1024).toFixed(1)} KB</span>}
+                       />
+                    </List.Item>
+                  )}
+                />
+              )}
+            </div>
           </Card>
         </Col>
       </Row>
+      
+              {/* 底部数据表格区域 */}
+        <Row gutter={[24, 24]}>
+          <Col span={24}>
+            <Card 
+              title={
+                <div className="config-card-title">
+                  <DatabaseOutlined style={{ color: '#667eea' }} />
+                  <span className="text-gradient">模板数据集</span>
+                </div>
+              }
+              extra={
+                <Button 
+                  onClick={showAddDataCellModal} 
+                  icon={<PlusOutlined />}
+                  className="modern-button primary"
+                  style={{ borderRadius: '8px' }}
+                >
+                  添加数据
+                </Button>
+              }
+              className="modern-card hover-lift data-table-section"
+              bodyStyle={{ padding: '20px' }}
+          >
+            <Table 
+              columns={dataColumns} 
+              dataSource={dataCells} 
+              rowKey="id"
+              className="modern-table"
+              pagination={{
+                pageSize: 10,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
+              }}
+            />
+          </Card>
+        </Col>
+      </Row>
+      
       <AddDataCellModal
         open={isModalOpen}
         onCancel={() => {
-            setIsModalOpen(false);
-            setEditingCell(null);
+          setIsModalOpen(false);
+          setEditingCell(null);
         }}
         onOk={handleAddDataCell}
         files={sourceFiles}
         dataCells={dataCells}
-        params={params} // Pass params here
+        params={params}
         initialValues={editingCell ? { ...editingCell, type: editingCell.type } : undefined}
       />
-      <Modal title="数据显示" open={dataValueOpen} onOk={() => setDataValueOpen(false)} onCancel={() => setDataValueOpen(false)}>
+      
+      <Modal 
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <FileTextOutlined style={{ color: '#667eea' }} />
+            <span>数据显示</span>
+          </div>
+        }
+        open={dataValueOpen} 
+        onOk={() => setDataValueOpen(false)} 
+        onCancel={() => setDataValueOpen(false)}
+        className="modern-modal"
+        okButtonProps={{ 
+          className: 'modern-button primary',
+          style: { borderRadius: '8px' }
+        }}
+        cancelButtonProps={{ 
+          className: 'modern-button secondary',
+          style: { borderRadius: '8px' }
+        }}
+      >
         <List
-            bordered
-            dataSource={dataValue}
-            renderItem={item => <List.Item>{item}</List.Item>}
+          className="modern-list"
+          dataSource={dataValue}
+          renderItem={item => (
+            <List.Item style={{ 
+              padding: '12px 16px',
+              borderRadius: '8px',
+              marginBottom: '8px',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-light)'
+            }}>
+              {item}
+            </List.Item>
+          )}
         />
       </Modal>
     </div>

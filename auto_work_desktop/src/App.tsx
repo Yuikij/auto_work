@@ -4,10 +4,9 @@ import TemplateList from "./components/TemplateList";
 import FileList from "./components/FileList";
 import Template from "./components/Template";
 import 'antd/dist/reset.css';
-
+import './App.css';
 
 const { Header, Content, Sider } = Layout;
-
 
 function App() {
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
@@ -17,32 +16,64 @@ function App() {
   };
   
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Header className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ color: 'white', fontSize: '20px' }}>AUTO WORK</div>
+    <Layout className="app-layout">
+      <Header className="app-header">
+        <div className="logo">AUTO WORK</div>
       </Header>
       <Layout>
-        <Sider width={350} theme="light" style={{ borderRight: '1px solid #f0f0f0' }}>
+        <Sider width={380} className="app-sidebar">
+          <div className="fade-in">
             <TemplateList 
-                type={2} 
-                onSelect={handleTemplateSelect} 
-                selectedId={selectedTemplateId}
+              type={2} 
+              onSelect={handleTemplateSelect} 
+              selectedId={selectedTemplateId}
             />
-            {selectedTemplateId && <FileList templateId={selectedTemplateId} />}
+            {selectedTemplateId && (
+              <div className="slide-in">
+                <FileList templateId={selectedTemplateId} />
+              </div>
+            )}
+          </div>
         </Sider>
-        <Layout style={{ padding: '0 24px 24px' }}>
-          <Content
-            style={{
-              padding: 24,
-              margin: 0,
-              minHeight: 280,
-              background: '#fff',
-            }}
-          >
+        <Layout>
+          <Content className="app-content">
             {selectedTemplateId ? (
+              <div className="fade-in">
                 <Template templateId={selectedTemplateId} />
+              </div>
             ) : (
-              <div>Please select a template to see its details.</div>
+              <div className="modern-card" style={{ 
+                textAlign: 'center', 
+                padding: '60px 40px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '400px'
+              }}>
+                <div style={{ 
+                  fontSize: '48px', 
+                  marginBottom: '24px',
+                  opacity: 0.3
+                }}>
+                  📋
+                </div>
+                <h2 style={{ 
+                  color: 'var(--text-secondary)',
+                  fontWeight: 400,
+                  margin: 0,
+                  fontSize: '18px'
+                }}>
+                  请选择一个模板来查看详情
+                </h2>
+                <p style={{ 
+                  color: 'var(--text-muted)',
+                  marginTop: '12px',
+                  fontSize: '14px'
+                }}>
+                  从左侧模板列表中选择一个模板开始工作
+                </p>
+              </div>
             )}
           </Content>
         </Layout>
